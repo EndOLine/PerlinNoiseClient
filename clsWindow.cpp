@@ -12,6 +12,8 @@ Log : 221118 - created
 bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	// Parse the menu selections:
 	//
+	BITMAP bm = {};
+
 	switch (wmId) {
 	case ID_FILE_SAVEAS:
 	{
@@ -33,6 +35,9 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetX = std::to_string(PerlinOffset[0]));
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetY = std::to_string(PerlinOffset[1]));
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetZ = std::to_string(PerlinOffset[2]));
+		GetObject(SwapBM, sizeof(BITMAP), &bm);
+		PropertyDialog.sSizeWidth = std::to_string(bm.bmWidth);
+		PropertyDialog.sSizeHeight = std::to_string(bm.bmHeight);
 		if (PropertyDialog.CreateTheDialog(hAppInst, IDD_PropDlg, hWnd) == IDOK) {
 			//
 			//  ... copy fields from PropertyDialog
@@ -49,6 +54,12 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 			} else {														// or update screen
 				UpdateSwapBuffer2();
 				InvalidateRect(hWnd, NULL, false);
+			};
+			int W = std::stoi(PropertyDialog.sSizeWidth);
+			int H = std::stoi(PropertyDialog.sSizeHeight);
+			if ((W > 0) && (H > 0)) {
+				SetClientSize(W, H);
+				//InvalidateRect(hWnd, NULL, FALSE);
 			};
 		};
 		return true;

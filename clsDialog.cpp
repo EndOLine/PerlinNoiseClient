@@ -81,6 +81,8 @@ void clsDialog::DoInitDialog(HWND hwndDlg) {
 	SetTextParameters(hwndDlg, IDC_OFFSETx, 5, sOffsetX);
 	SetTextParameters(hwndDlg, IDC_OFFSETy, 5, sOffsetY);
 	SetTextParameters(hwndDlg, IDC_OFFSETz, 5, sOffsetZ);
+	SetTextParameters(hwndDlg, IDC_WINDOWwidth, 4, sSizeWidth);
+	SetTextParameters(hwndDlg, IDC_WINDOWheight, 4, sSizeHeight);
 
 	// move standard buttons to the bottem of order
 	SetWindowPos(GetDlgItem(hwndDlg, IDOK), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// remove topmost status
@@ -101,6 +103,8 @@ void clsDialog::DoOk(HWND hwndDlg) {
 	sOffsetX = GetTextValue(hwndDlg, IDC_OFFSETx);
 	sOffsetY = GetTextValue(hwndDlg, IDC_OFFSETy);
 	sOffsetZ = GetTextValue(hwndDlg, IDC_OFFSETz);
+	sSizeWidth = GetTextValue(hwndDlg, IDC_WINDOWwidth);
+	sSizeHeight = GetTextValue(hwndDlg, IDC_WINDOWheight);
 }
 
 void clsDialog::SetTextParameters(const HWND hwndDlg, const int IDdlgItem, const int LimitText, const std::string& InitValue){

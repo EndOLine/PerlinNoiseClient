@@ -9,6 +9,7 @@ To Do:
 FPS display onscreen
 write ppm stream
 write ply object
+do something with colours
 ********************************************************************/
 #ifndef CLSWINDOW_H
 #define CLSWINDOW_H

@@ -23,6 +23,8 @@ public:
 	std::string sOffsetX = "";
 	std::string sOffsetY = "";
 	std::string sOffsetZ = "";
+	std::string sSizeWidth = "";
+	std::string sSizeHeight = "";
 public:
 	virtual LRESULT DoDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	INT_PTR CreateTheDialog(const HINSTANCE hInstance, int lpTemplate, HWND hWndParent);

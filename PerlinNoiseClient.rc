@@ -111,6 +111,11 @@ BEGIN
     LTEXT           "X:",IDC_STATIC,69,45,8,8
     LTEXT           "Y:",IDC_STATIC,122,45,8,8
     LTEXT           "Z:",IDC_STATIC,176,45,8,8
+    LTEXT           "Window size:",IDC_STATIC,7,59,43,8
+    LTEXT           "Width(x):",IDC_STATIC,44,72,32,8
+    LTEXT           "Height:(y):",IDC_STATIC,127,72,36,8
+    EDITTEXT        IDC_WINDOWwidth,78,69,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_WINDOWheight,163,69,40,14,ES_AUTOHSCROLL | ES_NUMBER
 END
 
 
