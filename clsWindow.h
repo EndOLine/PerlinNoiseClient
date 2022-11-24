@@ -5,6 +5,10 @@ Desc: Modified windows class for specific program
 
 Log : 221118 - created
 
+To Do:
+FPS display onscreen
+write ppm stream
+write ply object
 ********************************************************************/
 #ifndef CLSWINDOW_H
 #define CLSWINDOW_H
@@ -28,6 +32,10 @@ private:
 	clsPerlinNoise Noise;
 	bool WindowSizing = false;					// is window in the middle of sizing it's self
 	clsDialog PropertyDialog;
+	double PerlinScale = 10.0f;
+	double PerlinOffset[3] = { 0.0f };			// offset x,y,z; ie width,Height,z
+	int RefreshMS = 10;
+	int iTimeCounter = 0;						// timer counter
 
 public:
 	virtual bool DoPaint(HDC hdc) override;
@@ -45,5 +53,6 @@ public:
 	void UpdateSwapBuffer();
 	void UpdatePixels(DWORD* pPixels, const int Width, const int Height, const int StartColumn, const int IncrementColumn, const double Zvalue);
 	void UpdateSwapBuffer2(const double inputZ = 0.0);
+	void WindowsFullScreenToggle();
 };
 #endif

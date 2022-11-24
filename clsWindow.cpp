@@ -14,12 +14,12 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	//
 	switch (wmId) {
 	case ID_FILE_SAVEAS:
-		{
+	{
 		char filename[80] = "";
 		GetSaveFile(filename, sizeof(filename), NULL);
-		}
-		return true;
-		break;
+	}
+	return true;
+	break;
 	case ID_FILE_EXIT:
 		DestroyWindow(hWnd);
 		return true;
@@ -28,10 +28,28 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 		//
 		// ... copy fields to PropertyDialog
 		//
+		PropertyDialog.sRefresh = std::to_string(RefreshMS);
+		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sScale = std::to_string(PerlinScale));
+		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetX = std::to_string(PerlinOffset[0]));
+		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetY = std::to_string(PerlinOffset[1]));
+		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetZ = std::to_string(PerlinOffset[2]));
 		if (PropertyDialog.CreateTheDialog(hAppInst, IDD_PropDlg, hWnd) == IDOK) {
-		//
-		//  ... copy fields from PropertyDialog
-		//
+			//
+			//  ... copy fields from PropertyDialog
+			//
+			RefreshMS = std::stoi(PropertyDialog.sRefresh);
+			PerlinScale = std::stod(PropertyDialog.sScale);
+			PerlinOffset[0] = std::stod(PropertyDialog.sOffsetX);
+			PerlinOffset[1] = std::stod(PropertyDialog.sOffsetY);
+			PerlinOffset[2] = std::stod(PropertyDialog.sOffsetZ);
+			iTimeCounter = 0;
+			SetupTimer(0);		// stop timer
+			if (MenuItemIsChecked(GetMenu(hWnd), ID_ACTION_TIMER)) {		// restart timer
+				SetupTimer(RefreshMS);
+			} else {														// or update screen
+				UpdateSwapBuffer2();
+				InvalidateRect(hWnd, NULL, false);
+			};
 		};
 		return true;
 		break;
@@ -41,11 +59,15 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 			SetupTimer(0);
 		} else {
 			CheckMenuItem(GetMenu(hWnd), ID_ACTION_TIMER, MF_CHECKED);
-			SetupTimer(1);
+			SetupTimer(RefreshMS);
 		};
 		return true;
 		break;
-	}
+	case ID_ACTION_FULLSCREEN:
+		WindowsFullScreenToggle();
+		return true;
+		break;
+	};
 	
 #ifdef _DEBUG
 	std::string Message = "Command ID is: " + std::to_string(wmId);
@@ -104,7 +126,6 @@ void clsWindow::DoSizeMove(UINT message){
 
 bool clsWindow::DoTimer(UINT_PTR TimerID){
 	//OutputDebugString("Timer:\n");
-	static int iTimeCounter = 0;
 	iTimeCounter++;
 	iTimeCounter = iTimeCounter % 10000;
 	UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
@@ -239,7 +260,7 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 	};
 	
 	struct stLocalColour { unsigned char b, g, r, unused; };		// backwards; 32 bit for padding
-	union uColour {												// to convert from structure to DWORD
+	union uColour {													// to convert from structure to DWORD
 		stLocalColour stColour;
 		DWORD wColour;
 	};
@@ -251,11 +272,11 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 			double dy = (double)y / (double)Height;
 			double dz = Zvalue;
 			double pn = 0.0;
-			double Scale = 10.0f;
-			double Offset = 0.0f;
-			dx = (dx * Scale) + Offset;
-			dy = (dy * Scale) + Offset;
-			dz = (dz * Scale) + Offset;
+			double Scale = PerlinScale;
+			//double Offset = PerlinOffset;
+			dx = (dx * Scale) + PerlinOffset[0];
+			dy = (dy * Scale) + PerlinOffset[1];
+			dz = (dz * Scale) + PerlinOffset[2];
 			pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
 			if (pn < 0.1) {
 				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
@@ -283,42 +304,7 @@ void clsWindow::UpdateSwapBuffer2(const double inputZ) {
 	BITMAP bm{};
 	GetObject(SwapBM, sizeof(BITMAP), &bm);
 	
-	/*
-	struct stLocalColour { unsigned char b,g,r, unused; };		// backwards; 32 bit for padding
-	union uColour {												// to convert from structure to DWORD
-		stLocalColour stColour;
-		DWORD wColour;
-	};
 	
-	uColour Colour{};
-	for (int x = 0; x < bm.bmWidth; x++) {
-		for (int y = 0; y < bm.bmHeight; y++) {
-			double dx = (double)x / (double)bm.bmWidth;
-			double dy = (double)y / (double)bm.bmHeight;
-			double dz = inputZ;
-			double pn = 0.0;
-			double Scale = 10.0f;
-			double Offset = 0.0f;
-			dx = (dx * Scale) + Offset;
-			dy = (dy * Scale) + Offset;
-			dz = (dz * Scale) + Offset;
-			pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
-			if (pn < 0.1) {
-				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
-			} else if (pn < 0.4) {
-				Colour.stColour.b = (unsigned char)floor((255) * (pn+0.4f));
-				Colour.stColour.g = Colour.stColour.r = 0;
-			} else if (pn < 0.9) {
-				Colour.stColour.g = (unsigned char)floor((255) * pn);
-				Colour.stColour.r = Colour.stColour.b = 0;
-			} else {
-				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
-			};
-
-			pSwapPixels[y * bm.bmWidth + x] = Colour.wColour;
-		};
-	};
-	*/
 	std::thread T0(&clsWindow::UpdatePixels, this, pSwapPixels, bm.bmWidth, bm.bmHeight, 0, 4, inputZ);
 	std::thread T1(&clsWindow::UpdatePixels, this, pSwapPixels, bm.bmWidth, bm.bmHeight, 1, 4, inputZ);
 	std::thread T3(&clsWindow::UpdatePixels, this, pSwapPixels, bm.bmWidth, bm.bmHeight, 2, 4, inputZ);
@@ -327,8 +313,7 @@ void clsWindow::UpdateSwapBuffer2(const double inputZ) {
 	T1.join();
 	T3.join();
 	T4.join();
-	//UpdatePixels(pSwapPixels, bm.bmWidth, bm.bmHeight, 0, 2, inputZ);
-	//UpdatePixels(pSwapPixels, bm.bmWidth, bm.bmHeight, 1, 2, inputZ);
+
 
 	BITMAPINFO info{ };
 	info.bmiHeader.biSize = sizeof(info.bmiHeader);
@@ -346,6 +331,36 @@ void clsWindow::UpdateSwapBuffer2(const double inputZ) {
 	SelectObject(SwapDC, OrigBitmap);
 }
 
+void clsWindow::WindowsFullScreenToggle() {
+	// from https://devblogs.microsoft.com/oldnewthing/20100412-00/?p=14353
+	static WINDOWPLACEMENT g_wpPrev = { sizeof(g_wpPrev) };
+	static HMENU hMenu = {};
+	DWORD dwStyle = GetWindowLong(hWnd, GWL_STYLE);
+	if (dwStyle & WS_OVERLAPPEDWINDOW) {
+		MONITORINFO mi = { sizeof(mi) };
+		if (GetWindowPlacement(hWnd, &g_wpPrev) &&
+			GetMonitorInfo(MonitorFromWindow(hWnd,
+				MONITOR_DEFAULTTOPRIMARY), &mi)) {
+			hMenu = GetMenu(hWnd);
+			SetWindowLong(hWnd, GWL_STYLE,
+				dwStyle & ~WS_OVERLAPPEDWINDOW);
+			SetWindowPos(hWnd, HWND_TOP,
+				mi.rcMonitor.left, mi.rcMonitor.top,
+				mi.rcMonitor.right - mi.rcMonitor.left,
+				mi.rcMonitor.bottom - mi.rcMonitor.top,
+				SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+			SetMenu(hWnd, NULL);
+		}
+	} else {
+		SetWindowLong(hWnd, GWL_STYLE,
+			dwStyle | WS_OVERLAPPEDWINDOW);
+		SetWindowPlacement(hWnd, &g_wpPrev);
+		SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER |
+			SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+		SetMenu(hWnd, hMenu);
+	};
+}
 
 //bool clsWindow::UpdateSwapBuffer() {
 //	bool SomeThingToDraw = false;

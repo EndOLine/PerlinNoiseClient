@@ -9,7 +9,6 @@ Log :
 
 #include "clsDialog.h"
 
-
 LRESULT CALLBACK clsDialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
 	// look for user data
@@ -27,62 +26,16 @@ LRESULT CALLBACK clsDialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	return ptrclsDialogWindow->DoDialogProc(hWnd, message, wParam, lParam);
 };
 
-LRESULT clsDialog::DoDialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
+LRESULT clsDialog::DoDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam){
 	switch (message) {
 	case WM_INITDIALOG:
-		DoInitDialog(hWnd);
-		//// limit text box sizes
-		//SendMessage(GetDlgItem(hwndDlg, IDC_Width), EM_LIMITTEXT, 5, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_Height), EM_LIMITTEXT, 5, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_TTL), EM_LIMITTEXT, 5, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_DropRed), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_DropGreen), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_DropBlue), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_TailRed), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_TailGreen), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_TailBlue), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_BackRed), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_BackGreen), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_BackBlue), EM_LIMITTEXT, 3, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_REFRESH), EM_LIMITTEXT, 4, 0);
-		//SendMessage(GetDlgItem(hwndDlg, IDC_NewDrip), EM_LIMITTEXT, 4, 0);
-		//// initilize text boxes
-		//SetDlgItemText(hwndDlg, IDC_Width, czIDC_Width);
-		//SetDlgItemText(hwndDlg, IDC_Height, czIDC_Height);
-		//SetDlgItemText(hwndDlg, IDC_TTL, czIDC_TTL);
-		//SetDlgItemText(hwndDlg, IDC_DropRed, czIDC_DropRed);
-		//SetDlgItemText(hwndDlg, IDC_DropGreen, czIDC_DropGreen);
-		//SetDlgItemText(hwndDlg, IDC_DropBlue, czIDC_DropBlue);
-		//SetDlgItemText(hwndDlg, IDC_TailRed, czIDC_TailRed);
-		//SetDlgItemText(hwndDlg, IDC_TailGreen, czIDC_TailGreen);
-		//SetDlgItemText(hwndDlg, IDC_TailBlue, czIDC_TailBlue);
-		//SetDlgItemText(hwndDlg, IDC_BackRed, czIDC_BackRed);
-		//SetDlgItemText(hwndDlg, IDC_BackGreen, czIDC_BackGreen);
-		//SetDlgItemText(hwndDlg, IDC_BackBlue, czIDC_BackBlue);
-		//SetDlgItemText(hwndDlg, IDC_REFRESH, czIDC_Refresh);
-		//SetDlgItemText(hwndDlg, IDC_NewDrip, czIDC_NewDrip);
-		//// order tabs: (implement backwards;  ie. last tab first)
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_NewDrip), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_REFRESH), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_BackBlue), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_BackGreen), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_BackRed), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_TailBlue), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_TailGreen), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_TailRed), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_DropBlue), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_DropGreen), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_DropRed), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_TTL), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_Height), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//SetWindowPos(GetDlgItem(hwndDlg, IDC_Width), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		//
+		DoInitDialog(hwndDlg);
 		return true;
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			DoOk(hWnd);
+			DoOk(hwndDlg);
 			/*GetDlgItemText(hwndDlg, IDC_Width, czIDC_Width, 80);
 			GetDlgItemText(hwndDlg, IDC_Height, czIDC_Height, 80);
 			GetDlgItemText(hwndDlg, IDC_TTL, czIDC_TTL, 80);
@@ -97,11 +50,11 @@ LRESULT clsDialog::DoDialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			GetDlgItemText(hwndDlg, IDC_BackBlue, czIDC_BackBlue, 80);
 			GetDlgItemText(hwndDlg, IDC_REFRESH, czIDC_Refresh, 80);
 			GetDlgItemText(hwndDlg, IDC_NewDrip, czIDC_NewDrip, 80);*/
-			EndDialog(hWnd, wParam);
+			EndDialog(hwndDlg, wParam);
 			return TRUE;
 		case IDCANCEL:
-			DoCancel(hWnd);
-			EndDialog(hWnd, wParam);
+			DoCancel(hwndDlg);
+			EndDialog(hwndDlg, wParam);
 			return TRUE;
 		};
 	};
@@ -114,7 +67,7 @@ INT_PTR clsDialog::CreateTheDialog(const HINSTANCE hInstance, int lpTemplate, HW
 	//	== IDOK
 };
 
-void clsDialog::DoInitDialog(HWND hWnd) {
+void clsDialog::DoInitDialog(HWND hwndDlg) {
 	//// limit text box sizes
 	//SendMessage(GetDlgItem(hwndDlg, IDC_Width), EM_LIMITTEXT, 5, 0);
 	//// initilize text boxes
@@ -122,12 +75,55 @@ void clsDialog::DoInitDialog(HWND hWnd) {
 	//// order tabs: (implement backwards;  ie. last tab first)
 	//SetWindowPos(GetDlgItem(hwndDlg, IDC_NewDrip), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	//SetWindowPos(GetDlgItem(hwndDlg, IDC_REFRESH), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+	SetTextParameters(hwndDlg, IDC_REFRESH, 5, sRefresh);
+	SetTextParameters(hwndDlg, IDC_SCALE, 5, sScale);
+	SetTextParameters(hwndDlg, IDC_OFFSETx, 5, sOffsetX);
+	SetTextParameters(hwndDlg, IDC_OFFSETy, 5, sOffsetY);
+	SetTextParameters(hwndDlg, IDC_OFFSETz, 5, sOffsetZ);
+
+	// move standard buttons to the bottem of order
+	SetWindowPos(GetDlgItem(hwndDlg, IDOK), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// remove topmost status
+	SetWindowPos(GetDlgItem(hwndDlg, IDOK), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// move to bottom of "topmost' items
+	SetWindowPos(GetDlgItem(hwndDlg, IDCANCEL), HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// remove topmost status
+	SetWindowPos(GetDlgItem(hwndDlg, IDCANCEL), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// move to bottom of "topmost' items
+	//
+
 }
 
-void clsDialog::DoCancel(HWND hWnd) {
+void clsDialog::DoCancel(HWND hwndDlg) {
 
 }
-void clsDialog::DoOk(HWND hWnd) {
+void clsDialog::DoOk(HWND hwndDlg) {
 	// copy dialog fields to local parameters
+	sRefresh=GetTextValue(hwndDlg, IDC_REFRESH);
+	sScale = GetTextValue(hwndDlg, IDC_SCALE);
+	sOffsetX = GetTextValue(hwndDlg, IDC_OFFSETx);
+	sOffsetY = GetTextValue(hwndDlg, IDC_OFFSETy);
+	sOffsetZ = GetTextValue(hwndDlg, IDC_OFFSETz);
+}
+
+void clsDialog::SetTextParameters(const HWND hwndDlg, const int IDdlgItem, const int LimitText, const std::string& InitValue){
+	HWND hItem = GetDlgItem(hwndDlg, IDdlgItem);
+	SendMessage(hItem, EM_LIMITTEXT, LimitText, 0);
+	SetDlgItemText(hwndDlg, IDdlgItem, InitValue.c_str());
+	SetWindowPos(hItem, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// remove topmost status
+	SetWindowPos(hItem, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);			// move to bottom of "topmost' items
+}
+
+std::string clsDialog::GetTextValue(const HWND hwndDlg, const int IDdlgItem){
+	char czInput[80] = "";
+	std::string Output;
+	GetDlgItemText(hwndDlg, IDdlgItem, czInput, sizeof(czInput));
+	Output = czInput;
+	return Output;
+}
+
+// only remove trailing zeros after a '.'
+// leave at least one trailing zero
+void clsDialog::RemoveTrailingZeros(std::string& Value){
+	size_t PeriodLocation = Value.find_first_of('.');
+	if (PeriodLocation == std::string::npos) return;					// period not found
+	Value.erase(Value.find_last_not_of('0') + 2, std::string::npos);	// leave one trailing zero
 }
 
