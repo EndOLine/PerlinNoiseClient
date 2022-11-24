@@ -18,6 +18,7 @@ Log : 221118 - created
 #include "resource.h"
 #include "..\Common\clsPerlinNoise.h"
 #include <wingdi.h>		// for SetDIBits()
+#include "clsDialog.h"
 
 class clsWindow :public clsHGOWindow {
 private:
@@ -26,6 +27,8 @@ private:
 	DWORD *pSwapPixels = 0;
 	clsPerlinNoise Noise;
 	bool WindowSizing = false;					// is window in the middle of sizing it's self
+	clsDialog PropertyDialog;
+
 public:
 	virtual bool DoPaint(HDC hdc) override;
 	virtual bool DoCommand(int wmId, int wmEvent, LPARAM lParam) override;

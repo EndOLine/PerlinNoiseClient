@@ -24,6 +24,17 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 		DestroyWindow(hWnd);
 		return true;
 		break;
+	case ID_EDIT_PROPERTIES:
+		//
+		// ... copy fields to PropertyDialog
+		//
+		if (PropertyDialog.CreateTheDialog(hAppInst, IDD_PropDlg, hWnd) == IDOK) {
+		//
+		//  ... copy fields from PropertyDialog
+		//
+		};
+		return true;
+		break;
 	case ID_ACTION_TIMER:
 		if (MenuItemIsChecked(GetMenu(hWnd), ID_ACTION_TIMER)) {
 			CheckMenuItem(GetMenu(hWnd), ID_ACTION_TIMER, MF_UNCHECKED);

@@ -147,6 +147,7 @@
     <ClInclude Include="..\Common\clsHGOwindow.h" />
     <ClInclude Include="..\Common\clsPerlinNoise.h" />
     <ClInclude Include="clsApp.h" />
+    <ClInclude Include="clsDialog.h" />
     <ClInclude Include="clsWindow.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
@@ -156,6 +157,7 @@
     <ClCompile Include="..\Common\clsHGOwindow.cpp" />
     <ClCompile Include="..\Common\clsPerlinNoise.cpp" />
     <ClCompile Include="clsApp.cpp" />
+    <ClCompile Include="clsDialog.cpp" />
     <ClCompile Include="clsWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
