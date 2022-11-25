@@ -137,8 +137,21 @@ void clsWindow::DoSizeMove(UINT message){
 
 bool clsWindow::DoTimer(UINT_PTR TimerID){
 	//OutputDebugString("Timer:\n");
-	iTimeCounter++;
-	iTimeCounter = iTimeCounter % 10000;
+	static bool GoForward = true;
+	if (GoForward) {
+		iTimeCounter++;
+		if (iTimeCounter > 10000) {
+			GoForward = false;
+			iTimeCounter--;
+		};
+	} else {
+		iTimeCounter--;
+		if (iTimeCounter < 0) {
+			GoForward = true;
+			iTimeCounter++;
+		};
+	};
+	//iTimeCounter = iTimeCounter % 10000;
 	UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
 	InvalidateRect(hWnd, NULL, false);
 	return true;
