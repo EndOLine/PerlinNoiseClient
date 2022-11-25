@@ -13,15 +13,43 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	// Parse the menu selections:
 	//
 	BITMAP bm = {};
+	char filename[80] = "";
+	char foldername[80] = "";
 
 	switch (wmId) {
 	case ID_FILE_SAVEAS:
 	{
-		char filename[80] = "";
-		GetSaveFile(filename, sizeof(filename), NULL);
+		if (GetFileSaveName(filename, sizeof(filename))) {
+		//if (GetSaveFile(filename, sizeof(filename), "Portable Pixmap Format\0*.ppm\0All\0*.*\0")) {
+			SavePPM(SwapDC, filename);
+		};
 	}
 	return true;
 	break;
+	case ID_FILE_SAVESERIES:
+		if (GetFolderSaveName(foldername, sizeof(foldername))) {
+			static bool GoForward = true;
+			for (int i = 0; i < 20000; i++) {
+				if (GoForward) {
+					iTimeCounter++;
+					if (iTimeCounter > 10000) {
+						GoForward = false;
+						iTimeCounter--;
+					};
+				} else {
+					iTimeCounter--;
+					if (iTimeCounter < 0) {
+						GoForward = true;
+						iTimeCounter++;
+					};
+				};
+				UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
+				sprintf_s(filename, sizeof(filename), "%s\\%s%04i.ppm", foldername, "Image", i);
+				SavePPM(SwapDC, filename);
+			};
+		};
+		return true;
+		break;
 	case ID_FILE_EXIT:
 		DestroyWindow(hWnd);
 		return true;
@@ -278,6 +306,24 @@ void clsWindow::UpdateSwapBuffer() {
 	SelectObject(SwapDC, OrigBitmap);
 }
 
+void clsWindow::SavePPM(HDC SwapDC, const char* Filename){
+	COLORREF Colour;
+	clsPPM::stColour OutColour;
+	auto OrigBitmap = SelectObject(SwapDC, SwapBM);
+	BITMAP bm = {};
+	GetObject(SwapBM, sizeof(BITMAP), &bm);
+	clsPPM ppm(bm.bmHeight, bm.bmWidth);
+	for (int x = 0; x < bm.bmWidth; x++) {
+		for (int y = 0; y < bm.bmHeight; y++) {
+			Colour = GetPixel(SwapDC, x, y);
+			OutColour = { GetRValue(Colour), GetGValue(Colour), GetBValue(Colour) };
+			ppm.GetPixel(y, x) = OutColour;
+		};
+	};
+	ppm.SaveP6(Filename);
+	SelectObject(SwapDC, OrigBitmap);
+}
+
 void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,const int StartColumn, const int IncrementColumn, const double Zvalue) {
 	if (!pPixels) {
 		return;								// if no buffer space just exit
@@ -386,79 +432,108 @@ void clsWindow::WindowsFullScreenToggle() {
 	};
 }
 
-//bool clsWindow::UpdateSwapBuffer() {
-//	bool SomeThingToDraw = false;
-//	// clear swap buffer
-//	HBRUSH hbrush = CreateSolidBrush(RGB(Back.Red, Back.Green, Back.Blue));		// window colour -- dont forget to delete hbrush
-//	RECT rect = { 0,0,PixelXsize,PixelYsize };									// set rectangle to window's dimensions
-//
-//	if (BackGroundDC == 0) {
-//		FillRect(SwapDC, &rect, hbrush);					// fill window with colour
-//		SetBkColor(SwapDC, RGB(Back.Red, Back.Green, Back.Blue));
-//		SetBkMode(SwapDC, OPAQUE);
-//	} else {
-//		BitBlt(SwapDC, 0, 0, PixelXsize, PixelYsize, BackGroundDC, 0, 0, SRCCOPY);
-//		SetBkMode(SwapDC, TRANSPARENT);
-//	}
-//
-//
-//
-//	// get text dimensions
-//	TEXTMETRIC tm;
-//	GetTextMetrics(SwapDC, &tm);
-//
-//	// add new drip 
-//	if (!StopRain) {
-//		for (int x = 0; x < LineWidth; ++x) {
-//			if (pTextMatrix[x] == 0) {
-//				int temp = rng.RNG() % 1000;
-//				if (temp < NewDripChance) {			// Chance in a thousand
-//					pTextMatrix[x] = (rng.RNG() % ('~' - ' ')) + 1 + ' ';
-//					pTextMatrixTTL[x] = StartTTL;
-//				};
-//			};
-//		};
-//	};
-//
-//	// update swap DC from the text matrix
-//	unsigned char Temp[2] = " ";
-//	for (int x = 0; x < LineWidth; ++x) {
-//		for (int y = 0; y < NbrLines; ++y) {
-//			if ((Index(x, y) >= BufferSize) || (Index(x, y) < 0)) {
-//				break; // error
-//			}
-//			Temp[0] = pTextMatrix[Index(x, y)];
-//			if (Temp[0] != 0) {
-//				if (pTextMatrixTTL[Index(x, y)] == StartTTL) {
-//					SetTextColor(SwapDC, RGB(Drop.Red, Drop.Green, Drop.Blue));
-//				} else {
-//					float fScale = 1.0f - ((float)pTextMatrixTTL[Index(x, y)] / (float)StartTTL);
-//					stColour ScaledColour = { Tail.Red - ((Tail.Red - Back.Red) * fScale),
-//											Tail.Green - ((Tail.Green - Back.Green) * fScale),
-//											Tail.Blue - ((Tail.Blue - Back.Blue) * fScale) };
-//					SetTextColor(SwapDC, RGB(ScaledColour.Red, ScaledColour.Green, ScaledColour.Blue));
-//				};
-//				TextOut(SwapDC, tm.tmMaxCharWidth * x, tm.tmHeight * y, (LPCSTR)&Temp, 1);
-//				SomeThingToDraw = true;
-//				--pTextMatrixTTL[Index(x, y)];
-//				if (pTextMatrixTTL[Index(x, y)] == 0) {
-//					pTextMatrix[Index(x, y)] = 0;
-//				};
-//			};
-//		};
-//	};
-//
-//	// move drip down screen
-//	for (int x = 0; x < LineWidth; ++x) {
-//		for (int y = NbrLines - 1; y > 0; --y) {
-//			if (pTextMatrix[Index(x, y)] == 0) {
-//				if (pTextMatrix[Index(x, y - 1)] != 0) {
-//					pTextMatrix[Index(x, y)] = (rng.RNG() % ('~' - ' ')) + 1 + ' ';
-//					pTextMatrixTTL[Index(x, y)] = StartTTL;
-//				}
-//			}
-//		}
-//	};
-//	DeleteObject(hbrush);		// make sure to delete brush when not used
-//	return SomeThingToDraw;
-//}
+// example from "https://docs.microsoft.com/en-us/windows/win32/learnwin32/example--the-open-dialog-box"
+//				"https://docs.microsoft.com/en-us/windows/win32/shell/common-file-dialog#ifiledialog-ifileopendialog-and-ifilesavedialog"
+bool clsWindow::GetFileSaveName(char* pFilePath, int iPathBufferSize) {
+	bool bPathFound = false;
+
+	COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Portable Pixmap Format", L"*.ppm" },
+			{ L"All files", L"*.*" }
+	};
+
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+		COINIT_DISABLE_OLE1DDE);
+	if (SUCCEEDED(hr))
+	{
+		IFileSaveDialog* pFileSave;
+		// create the FileSave	CLSID_FileSaveDialog  IID_IFileSaveDialog
+		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
+			IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
+	
+		pFileSave->SetFileTypes(_countof(FileTypes), FileTypes);	// allow selection of these file types
+		pFileSave->SetDefaultExtension(L"ppm");						// set default extension on return. can be multiple seperated by ; L"doc;docx"
+
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileSave->Show(hWnd);								// setting handle to owner blocks use of menu. Timer still works.
+
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem* pItem;
+				hr = pFileSave->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
+					PWSTR pszFilePath;
+
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
+						size_t i;
+						wcstombs_s(&i,pFilePath, iPathBufferSize, pszFilePath, iPathBufferSize-1);
+						bPathFound = true;
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileSave->Release();
+		}
+		CoUninitialize();
+	}
+	return bPathFound;
+}
+
+bool clsWindow::GetFolderSaveName(char* pFolderPath, int iPathBufferSize) {
+	bool bPathFound = false;
+
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+		COINIT_DISABLE_OLE1DDE);
+	if (SUCCEEDED(hr))
+	{
+		IFileOpenDialog* pFileOpen = 0;
+
+		// create the FileSave	CLSID_FileSaveDialog  IID_IFileSaveDialog
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+			IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+		pFileOpen->SetOptions(FOS_PICKFOLDERS | FOS_PATHMUSTEXIST); // for picking folders only
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileOpen->Show(hWnd);								// setting handle to owner blocks use of menu. Timer still works.
+
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem* pItem;
+				hr = pFileOpen->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
+					PWSTR pszFolderPath;
+
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFolderPath);
+
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
+						//std::wcstombs(pFolderPath, pszFolderPath, iPathBufferSize);
+						size_t i;
+						wcstombs_s(&i, pFolderPath, iPathBufferSize, pszFolderPath, iPathBufferSize - 1);
+						bPathFound = true;
+						CoTaskMemFree(pszFolderPath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileOpen->Release();
+		}
+		CoUninitialize();
+	}
+	return bPathFound;
+}
+
+

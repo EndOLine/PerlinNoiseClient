@@ -18,12 +18,13 @@ do something with colours
 #include <thread>
 //#include <Gdiplusimaging.h>
 //#include <Gdiplus.h>
-
+#include <shobjidl.h>		// for SaveFile Dialog box
 #include "..\Common\clsHGOwindow.h"
 #include "resource.h"
 #include "..\Common\clsPerlinNoise.h"
 #include <wingdi.h>		// for SetDIBits()
 #include "clsDialog.h"
+#include "..\Common\clsPPM.h"
 
 class clsWindow :public clsHGOWindow {
 private:
@@ -55,5 +56,9 @@ public:
 	void UpdatePixels(DWORD* pPixels, const int Width, const int Height, const int StartColumn, const int IncrementColumn, const double Zvalue);
 	void UpdateSwapBuffer2(const double inputZ = 0.0);
 	void WindowsFullScreenToggle();
+
+	void SavePPM(HDC SwapDC, const char *Filename);
+	bool GetFileSaveName(char* pFilePath, int iPathBufferSize);
+	bool GetFolderSaveName(char* pFolderPath, int iPathBufferSize);
 };
 #endif

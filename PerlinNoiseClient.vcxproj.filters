@@ -39,6 +39,9 @@
     <ClInclude Include="clsDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\clsPPM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="clsApp.cpp">
@@ -60,6 +63,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="clsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\clsPPM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
