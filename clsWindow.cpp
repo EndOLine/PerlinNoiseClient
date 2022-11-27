@@ -28,22 +28,8 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	break;
 	case ID_FILE_SAVESERIES:
 		if (GetFolderSaveName(foldername, sizeof(foldername))) {
-			static bool GoForward = true;
-			for (int i = 0; i < 20000; i++) {
-				if (GoForward) {
-					iTimeCounter++;
-					if (iTimeCounter > 10000) {
-						GoForward = false;
-						iTimeCounter--;
-					};
-				} else {
-					iTimeCounter--;
-					if (iTimeCounter < 0) {
-						GoForward = true;
-						iTimeCounter++;
-					};
-				};
-				UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
+			for (int i = 0; i < Frames; i++) {
+				UpdateSwapBuffer2((double)i * Zinc);
 				sprintf_s(filename, sizeof(filename), "%s\\%s%04i.ppm", foldername, "Image", i);
 				SavePPM(SwapDC, filename);
 			};
