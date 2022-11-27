@@ -19,6 +19,8 @@ public:
 	// ... list fields here
 	//
 	std::string sRefresh = "";
+	std::string sFrames = "";
+	std::string sZinc = "";
 	std::string sScale = "";
 	std::string sOffsetX = "";
 	std::string sOffsetY = "";

@@ -59,6 +59,8 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 		// ... copy fields to PropertyDialog
 		//
 		PropertyDialog.sRefresh = std::to_string(RefreshMS);
+		PropertyDialog.sFrames = std::to_string(Frames);
+		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sZinc = std::to_string(Zinc));
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sScale = std::to_string(PerlinScale));
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetX = std::to_string(PerlinOffset[0]));
 		PropertyDialog.RemoveTrailingZeros(PropertyDialog.sOffsetY = std::to_string(PerlinOffset[1]));
@@ -71,6 +73,8 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 			//  ... copy fields from PropertyDialog
 			//
 			RefreshMS = std::stoi(PropertyDialog.sRefresh);
+			Frames = std::stoi(PropertyDialog.sFrames);
+			Zinc = std::stod(PropertyDialog.sZinc);
 			PerlinScale = std::stod(PropertyDialog.sScale);
 			PerlinOffset[0] = std::stod(PropertyDialog.sOffsetX);
 			PerlinOffset[1] = std::stod(PropertyDialog.sOffsetY);
@@ -168,7 +172,7 @@ bool clsWindow::DoTimer(UINT_PTR TimerID){
 	static bool GoForward = true;
 	if (GoForward) {
 		iTimeCounter++;
-		if (iTimeCounter > 10000) {
+		if (iTimeCounter > Frames) {
 			GoForward = false;
 			iTimeCounter--;
 		};
@@ -180,7 +184,8 @@ bool clsWindow::DoTimer(UINT_PTR TimerID){
 		};
 	};
 	//iTimeCounter = iTimeCounter % 10000;
-	UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
+	UpdateSwapBuffer2((double)iTimeCounter * Zinc);
+	//UpdateSwapBuffer2((double)iTimeCounter / 10000.0f);
 	InvalidateRect(hWnd, NULL, false);
 	return true;
 }

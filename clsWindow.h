@@ -37,6 +37,8 @@ private:
 	double PerlinScale = 10.0f;
 	double PerlinOffset[3] = { 0.0f };			// offset x,y,z; ie width,Height,z
 	int RefreshMS = 10;
+	int Frames = 10000;							// number of frames to generate
+	double Zinc = 0.0001f;						// change in z value for each frame
 	int iTimeCounter = 0;						// timer counter
 
 public:

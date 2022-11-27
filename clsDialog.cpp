@@ -36,20 +36,6 @@ LRESULT clsDialog::DoDialogProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARA
 		switch (LOWORD(wParam)) {
 		case IDOK:
 			DoOk(hwndDlg);
-			/*GetDlgItemText(hwndDlg, IDC_Width, czIDC_Width, 80);
-			GetDlgItemText(hwndDlg, IDC_Height, czIDC_Height, 80);
-			GetDlgItemText(hwndDlg, IDC_TTL, czIDC_TTL, 80);
-			GetDlgItemText(hwndDlg, IDC_DropRed, czIDC_DropRed, 80);
-			GetDlgItemText(hwndDlg, IDC_DropGreen, czIDC_DropGreen, 80);
-			GetDlgItemText(hwndDlg, IDC_DropBlue, czIDC_DropBlue, 80);
-			GetDlgItemText(hwndDlg, IDC_TailRed, czIDC_TailRed, 80);
-			GetDlgItemText(hwndDlg, IDC_TailGreen, czIDC_TailGreen, 80);
-			GetDlgItemText(hwndDlg, IDC_TailBlue, czIDC_TailBlue, 80);
-			GetDlgItemText(hwndDlg, IDC_BackRed, czIDC_BackRed, 80);
-			GetDlgItemText(hwndDlg, IDC_BackGreen, czIDC_BackGreen, 80);
-			GetDlgItemText(hwndDlg, IDC_BackBlue, czIDC_BackBlue, 80);
-			GetDlgItemText(hwndDlg, IDC_REFRESH, czIDC_Refresh, 80);
-			GetDlgItemText(hwndDlg, IDC_NewDrip, czIDC_NewDrip, 80);*/
 			EndDialog(hwndDlg, wParam);
 			return TRUE;
 		case IDCANCEL:
@@ -77,6 +63,8 @@ void clsDialog::DoInitDialog(HWND hwndDlg) {
 	//SetWindowPos(GetDlgItem(hwndDlg, IDC_REFRESH), HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	SetTextParameters(hwndDlg, IDC_REFRESH, 5, sRefresh);
+	SetTextParameters(hwndDlg, IDC_FRAMES, 5, sFrames);
+	SetTextParameters(hwndDlg, IDC_ZINC, 7, sZinc);
 	SetTextParameters(hwndDlg, IDC_SCALE, 5, sScale);
 	SetTextParameters(hwndDlg, IDC_OFFSETx, 5, sOffsetX);
 	SetTextParameters(hwndDlg, IDC_OFFSETy, 5, sOffsetY);
@@ -99,6 +87,8 @@ void clsDialog::DoCancel(HWND hwndDlg) {
 void clsDialog::DoOk(HWND hwndDlg) {
 	// copy dialog fields to local parameters
 	sRefresh=GetTextValue(hwndDlg, IDC_REFRESH);
+	sFrames = GetTextValue(hwndDlg, IDC_FRAMES);
+	sZinc = GetTextValue(hwndDlg, IDC_ZINC);
 	sScale = GetTextValue(hwndDlg, IDC_SCALE);
 	sOffsetX = GetTextValue(hwndDlg, IDC_OFFSETx);
 	sOffsetY = GetTextValue(hwndDlg, IDC_OFFSETy);
