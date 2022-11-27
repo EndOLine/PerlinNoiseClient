@@ -8,6 +8,16 @@ Log : 221118 - created
 
 #include "clsWindow.h"
 
+clsWindow::clsWindow() {
+	//stColourRamp R = { 0.1f, {0,0,0},{255,255,255} };
+	//ColourRamp.push_back({ 0.1f, {0,0,0},{255,255,255} });
+
+	ColourRamp.push_back({ 0.1f, {0,0,0},{25,25,25} });
+	ColourRamp.push_back({ 0.4f, {0,0,102},{0,0,204} });
+	ColourRamp.push_back({ 0.9f, {0,150,0},{0,200,0} });
+	ColourRamp.push_back({ 1.0f, {230,230,230},{255,255,255} });
+	std::sort(ColourRamp.begin(), ColourRamp.end(), [](stColourRamp a, stColourRamp b) {return a.MaxValue < b.MaxValue; });
+}
 
 bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	// Parse the menu selections:
@@ -15,6 +25,7 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	BITMAP bm = {};
 	char filename[80] = "";
 	char foldername[80] = "";
+	char Line[80] = "";
 
 	switch (wmId) {
 	case ID_FILE_SAVEAS:
@@ -54,6 +65,13 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 		GetObject(SwapBM, sizeof(BITMAP), &bm);
 		PropertyDialog.sSizeWidth = std::to_string(bm.bmWidth);
 		PropertyDialog.sSizeHeight = std::to_string(bm.bmHeight);
+		PropertyDialog.sColourRamp.clear();
+		for (int i = 0; i < ColourRamp.size(); i++) {
+			sprintf_s(Line, sizeof(Line), "%f %i,%i,%i %i,%i,%i", ColourRamp[i].MaxValue,
+				ColourRamp[i].StartColour.r, ColourRamp[i].StartColour.g, ColourRamp[i].StartColour.b,
+				ColourRamp[i].EndColour.r, ColourRamp[i].EndColour.g, ColourRamp[i].EndColour.b);
+			PropertyDialog.sColourRamp.push_back(Line);
+		};
 		if (PropertyDialog.CreateTheDialog(hAppInst, IDD_PropDlg, hWnd) == IDOK) {
 			//
 			//  ... copy fields from PropertyDialog
@@ -65,6 +83,26 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 			PerlinOffset[0] = std::stod(PropertyDialog.sOffsetX);
 			PerlinOffset[1] = std::stod(PropertyDialog.sOffsetY);
 			PerlinOffset[2] = std::stod(PropertyDialog.sOffsetZ);
+
+			ColourRamp.clear();
+			for (int i = 0; i < PropertyDialog.sColourRamp.size(); i++) {
+				stColourRamp Hold;
+				int sr, sg, sb, er, eg, eb;
+				float m;
+				sscanf_s(PropertyDialog.sColourRamp[i].c_str(), "%f %d,%d,%d %d,%d,%d",
+					&m, &sr, &sg, &sb,
+					&er, &eg, &eb);
+				Hold.MaxValue = m;
+				Hold.StartColour.r = sr; Hold.StartColour.g = sg; Hold.StartColour.b = sb;
+				Hold.EndColour.r = er; Hold.EndColour.g = eg; Hold.EndColour.b = eb;
+				if (Hold.MaxValue < 0.0f) Hold.MaxValue = 0.0f;
+				if (Hold.MaxValue > 1.0f) Hold.MaxValue = 1.0f;
+				ColourRamp.push_back(Hold);
+			};
+			std::sort(ColourRamp.begin(), ColourRamp.end(), [](stColourRamp a, stColourRamp b) {return a.MaxValue < b.MaxValue; });
+
+			//
+
 			iTimeCounter = 0;
 			SetupTimer(0);		// stop timer
 			if (MenuItemIsChecked(GetMenu(hWnd), ID_ACTION_TIMER)) {		// restart timer
@@ -268,7 +306,7 @@ void clsWindow::GetLastErrorMessage(const DWORD LastError, char* poBuffer, int B
 	};
 }
 
-double clsWindow::Scale(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax) {
+double clsWindow::ScaleValue(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax) {
 	long double dScale = (dInput - dInputMin) / (dInputMin - dInputMax);
 	return (dScale) * (dOutPutMin - dOutputMax) + dOutPutMin;
 }
@@ -339,7 +377,20 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 			dy = (dy * Scale) + PerlinOffset[1];
 			dz = (dz * Scale) + PerlinOffset[2];
 			pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
-			if (pn < 0.1) {
+
+
+			Colour.stColour = { 0,0,0 };
+			for (int i = 0; i < ColourRamp.size(); i++) {
+				if (pn < ColourRamp[i].MaxValue) {
+					//(i>0?ColourRamp[i-1].MaxValue:0.0f)
+					//double bScaled = ScaleValue(pn, 0.0f, ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r);
+					Colour.stColour.r = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r));
+					Colour.stColour.g = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.g, ColourRamp[i].EndColour.g));
+					Colour.stColour.b = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.b, ColourRamp[i].EndColour.b));
+					break;
+				};
+			};
+			/*if (pn < 0.1) {
 				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
 			} else if (pn < 0.4) {
 				Colour.stColour.b = (unsigned char)floor((255) * (pn + 0.4f));
@@ -349,7 +400,7 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 				Colour.stColour.r = Colour.stColour.b = 0;
 			} else {
 				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
-			};
+			};*/
 
 			pSwapPixels[y * Width + x] = Colour.wColour;
 		};

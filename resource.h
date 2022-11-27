@@ -13,8 +13,18 @@
 #define IDC_WINDOWwidth                 1007
 #define IDC_WINDOWheight                1008
 #define IDC_FRAMES                      1009
-#define IDC_EDIT2                       1010
 #define IDC_ZINC                        1010
+#define IDC_COLOURS                     1012
+#define IDC_REMOVE                      1013
+#define IDC_ADD                         1014
+#define IDC_MAXVALUE                    1015
+#define IDC_STARTRED                    1016
+#define IDC_STARTGREEN                  1017
+#define IDC_STARTBLUE                   1018
+#define IDC_ENDRED                      1019
+#define IDC_ENDGREEN                    1020
+#define IDC_EDIT7                       1021
+#define IDC_ENDBLUE                     1021
 #define ID_FILE_SAVEAS                  40001
 #define ID_FILE_EXIT                    40002
 #define ID_HELP_ABOUT                   40003
@@ -30,7 +40,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40019
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

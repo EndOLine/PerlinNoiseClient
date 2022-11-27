@@ -19,6 +19,7 @@ do something with colours
 //#include <Gdiplusimaging.h>
 //#include <Gdiplus.h>
 #include <shobjidl.h>		// for SaveFile Dialog box
+#include <algorithm>		// for sort
 #include "..\Common\clsHGOwindow.h"
 #include "resource.h"
 #include "..\Common\clsPerlinNoise.h"
@@ -40,8 +41,19 @@ private:
 	int Frames = 10000;							// number of frames to generate
 	double Zinc = 0.0001f;						// change in z value for each frame
 	int iTimeCounter = 0;						// timer counter
+	struct stColour {
+		unsigned char r=0, g=0, b=0;
+	};
+	struct stColourRamp {
+		double MaxValue = 0.0f;					// applies to values < this
+		stColour StartColour;
+		stColour EndColour;
+	};
+	std::vector<stColourRamp> ColourRamp;
+
 
 public:
+	clsWindow();
 	virtual bool DoPaint(HDC hdc) override;
 	virtual bool DoCommand(int wmId, int wmEvent, LPARAM lParam) override;
 	virtual bool DoSize(WPARAM wParam, int wmHeight, int wmWidth) override;
@@ -53,7 +65,7 @@ public:
 	void CreateSwapBuffer(const HWND hWindow, const int iWidth, const int iHeight);
 	void DeleteSwapBuffer();
 	void GetLastErrorMessage(const DWORD LastError, char* poBuffer, int BufferSize);
-	double Scale(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax);
+	double ScaleValue(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax);
 	void UpdateSwapBuffer();
 	void UpdatePixels(DWORD* pPixels, const int Width, const int Height, const int StartColumn, const int IncrementColumn, const double Zvalue);
 	void UpdateSwapBuffer2(const double inputZ = 0.0);
