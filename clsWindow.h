@@ -26,6 +26,7 @@ do something with colours
 #include <wingdi.h>		// for SetDIBits()
 #include "clsDialog.h"
 #include "..\Common\clsPPM.h"
+#include "..\Common\clsHGOnode.h"
 
 class clsWindow :public clsHGOWindow {
 private:
@@ -51,7 +52,6 @@ private:
 	};
 	std::vector<stColourRamp> ColourRamp;
 
-
 public:
 	clsWindow();
 	virtual bool DoPaint(HDC hdc) override;
@@ -72,7 +72,10 @@ public:
 	void WindowsFullScreenToggle();
 
 	void SavePPM(HDC SwapDC, const char *Filename);
-	bool GetFileSaveName(char* pFilePath, int iPathBufferSize);
+	bool GetFileSaveName(char* pFilePath, int iPathBufferSize, COMDLG_FILTERSPEC* inFileTypes = 0, const int inNbrTypes=0, const wchar_t *inDefault=0);
 	bool GetFolderSaveName(char* pFolderPath, int iPathBufferSize);
+	bool GetFileOpenName(char* pFilePath, int iPathBufferSize, COMDLG_FILTERSPEC* inFileTypes=0, const int inNbrTypes=0, const wchar_t* inDefault=0);
+	void SaveConfiguration(const std::string Filename);
+	void LoadConfiguration(const std::string Filename);
 };
 #endif

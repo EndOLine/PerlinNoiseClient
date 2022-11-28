@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\clsHGOapplication.h" />
+    <ClInclude Include="..\Common\clsHGOnode.h" />
     <ClInclude Include="..\Common\clsHGOwindow.h" />
     <ClInclude Include="..\Common\clsPerlinNoise.h" />
     <ClInclude Include="..\Common\clsPPM.h" />
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\clsHGOapplication.cpp" />
+    <ClCompile Include="..\Common\clsHGOnode.cpp" />
     <ClCompile Include="..\Common\clsHGOwindow.cpp" />
     <ClCompile Include="..\Common\clsPerlinNoise.cpp" />
     <ClCompile Include="..\Common\clsPPM.cpp" />

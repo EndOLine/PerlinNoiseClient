@@ -30,7 +30,11 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	switch (wmId) {
 	case ID_FILE_SAVEAS:
 	{
-		if (GetFileSaveName(filename, sizeof(filename))) {
+		COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Portable Pixmap Format", L"*.ppm" },
+			{ L"All files", L"*.*" }
+		};
+		if (GetFileSaveName(filename, sizeof(filename), &FileTypes[0], _countof(FileTypes), L"ppm")) {
 		//if (GetSaveFile(filename, sizeof(filename), "Portable Pixmap Format\0*.ppm\0All\0*.*\0")) {
 			SavePPM(SwapDC, filename);
 		};
@@ -43,6 +47,26 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 				UpdateSwapBuffer2((double)i * Zinc);
 				sprintf_s(filename, sizeof(filename), "%s\\%s%04i.ppm", foldername, "Image", i);
 				SavePPM(SwapDC, filename);
+			};
+		};
+		return true;
+		break;
+	case ID_FILE_SAVECONFIG:
+		if (GetFileSaveName(filename, sizeof(filename))) {
+			SaveConfiguration(filename);
+		};
+		return true;
+		break;
+	case ID_FILE_OPENCONFIG:
+		if (GetFileOpenName(filename, sizeof(filename))) {
+			LoadConfiguration(filename);
+			iTimeCounter = 0;
+			SetupTimer(0);	
+			if (MenuItemIsChecked(GetMenu(hWnd), ID_ACTION_TIMER)) {		// restart timer
+				SetupTimer(RefreshMS);
+			} else {														// or update screen
+				UpdateSwapBuffer2();
+				InvalidateRect(hWnd, NULL, false);
 			};
 		};
 		return true;
@@ -476,26 +500,42 @@ void clsWindow::WindowsFullScreenToggle() {
 
 // example from "https://docs.microsoft.com/en-us/windows/win32/learnwin32/example--the-open-dialog-box"
 //				"https://docs.microsoft.com/en-us/windows/win32/shell/common-file-dialog#ifiledialog-ifileopendialog-and-ifilesavedialog"
-bool clsWindow::GetFileSaveName(char* pFilePath, int iPathBufferSize) {
+bool clsWindow::GetFileSaveName(char* pFilePath, int iPathBufferSize,COMDLG_FILTERSPEC* inFileTypes, const int inNbrTypes, const wchar_t* inDefault) {
 	bool bPathFound = false;
+	//{	{ L"Portable Pixmap Format", L"*.ppm" }, { L"All files", L"*.*" } }
 
-	COMDLG_FILTERSPEC FileTypes[] = {
+	/*COMDLG_FILTERSPEC FileTypes[] = {
 			{ L"Portable Pixmap Format", L"*.ppm" },
 			{ L"All files", L"*.*" }
+	};*/
+	COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Text file format", L"*.txt" },
+			{ L"All files", L"*.*" }
 	};
+	//int NbrTypes = _countof(FileTypes);
+
+	//COMDLG_FILTERSPEC* FileTypetoUse = ((inFileTypes == 0) ? &FileTypes[0] : inFileTypes);
+	//int NbrTypes = ((inFileTypes == 0) ? _countof(FileTypes) : inNbrTypes);
 
 	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
 		COINIT_DISABLE_OLE1DDE);
-	if (SUCCEEDED(hr))
-	{
+
+	if (SUCCEEDED(hr))	{
 		IFileSaveDialog* pFileSave;
 		// create the FileSave	CLSID_FileSaveDialog  IID_IFileSaveDialog
 		hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
 			IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
 	
-		pFileSave->SetFileTypes(_countof(FileTypes), FileTypes);	// allow selection of these file types
-		pFileSave->SetDefaultExtension(L"ppm");						// set default extension on return. can be multiple seperated by ; L"doc;docx"
-
+		if (inFileTypes == 0) {
+			pFileSave->SetFileTypes(_countof(FileTypes), FileTypes);	// allow selection of these file types
+		} else {
+			pFileSave->SetFileTypes(inNbrTypes, inFileTypes);
+		};
+		if (inDefault == 0) {
+			pFileSave->SetDefaultExtension(L"ppm");						// set default extension on return. can be multiple seperated by ; L"doc;docx"
+		} else {
+			pFileSave->SetDefaultExtension(inDefault);
+		};
 		if (SUCCEEDED(hr))
 		{
 			// Show the Open dialog box.
@@ -528,6 +568,103 @@ bool clsWindow::GetFileSaveName(char* pFilePath, int iPathBufferSize) {
 		CoUninitialize();
 	}
 	return bPathFound;
+}
+
+bool clsWindow::GetFileOpenName(char* pFilePath, int iPathBufferSize, COMDLG_FILTERSPEC* inFileTypes, const int inNbrTypes, const wchar_t* inDefault) {
+	bool bPathFound = false;
+	
+	COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Text file format", L"*.txt" },
+			{ L"All files", L"*.*" }
+	};
+
+	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
+		COINIT_DISABLE_OLE1DDE);
+
+	if (SUCCEEDED(hr)) {
+		IFileOpenDialog* pFileSave;
+		// create the FileSave	CLSID_FileSaveDialog  IID_IFileSaveDialog
+		hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+			IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileSave));
+
+		if (inFileTypes == 0) {
+			pFileSave->SetFileTypes(_countof(FileTypes), FileTypes);	// allow selection of these file types
+		} else {
+			pFileSave->SetFileTypes(inNbrTypes, inFileTypes);
+		};
+		if (inDefault == 0) {
+			pFileSave->SetDefaultExtension(L"ppm");						// set default extension on return. can be multiple seperated by ; L"doc;docx"
+		} else {
+			pFileSave->SetDefaultExtension(inDefault);
+		};
+		if (SUCCEEDED(hr))
+		{
+			// Show the Open dialog box.
+			hr = pFileSave->Show(hWnd);								// setting handle to owner blocks use of menu. Timer still works.
+
+			// Get the file name from the dialog box.
+			if (SUCCEEDED(hr))
+			{
+				IShellItem* pItem;
+				hr = pFileSave->GetResult(&pItem);
+				if (SUCCEEDED(hr))
+				{
+					PWSTR pszFilePath;
+
+					hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+
+					// Display the file name to the user.
+					if (SUCCEEDED(hr))
+					{
+						size_t i;
+						wcstombs_s(&i, pFilePath, iPathBufferSize, pszFilePath, iPathBufferSize - 1);
+						bPathFound = true;
+						CoTaskMemFree(pszFilePath);
+					}
+					pItem->Release();
+				}
+			}
+			pFileSave->Release();
+		}
+		CoUninitialize();
+	}
+	return bPathFound;
+}
+
+void clsWindow::LoadConfiguration(const std::string Filename){
+	clsHGOnode Parameters;
+	Parameters.ReadFile(Filename);
+	PerlinScale = Parameters("Scale").GetDouble();
+	PerlinOffset[0] = Parameters("Offset")("x").GetDouble();
+	PerlinOffset[1] = Parameters("Offset")("y").GetDouble();
+	PerlinOffset[2] = Parameters("Offset")("z").GetDouble();
+	RefreshMS = Parameters("RefreshMS").GetDouble();
+	Frames = Parameters("NbrFrames").GetInt();
+	Zinc = Parameters("Z-Increment").GetDouble();
+	
+	/*Parameters("Screen").AddChild("Width", (int)bm.bmWidth);
+	Parameters("Screen").AddChild("Height", (int)bm.bmHeight);*/
+	int W = Parameters("Screen")("Width").GetInt();
+	int H = Parameters("Screen")("Height").GetInt();
+	if ((W > 0) && (H > 0)) {
+		SetClientSize(W, H);
+	};
+
+
+	int i = 0;
+	ColourRamp.clear();
+	while (Parameters("ColourRamp", i).GetName() == "ColourRamp") {
+		stColourRamp h;
+		h.MaxValue = Parameters("ColourRamp", i)("Value").GetDouble();
+		h.StartColour.r = Parameters("ColourRamp", i)("Start")("Red").GetInt();
+		h.StartColour.g = Parameters("ColourRamp", i)("Start")("Green").GetInt();
+		h.StartColour.b = Parameters("ColourRamp", i)("Start")("Blue").GetInt();
+		h.EndColour.r = Parameters("ColourRamp", i)("End")("Red").GetInt();
+		h.EndColour.g = Parameters("ColourRamp", i)("End")("Green").GetInt();
+		h.EndColour.b = Parameters("ColourRamp", i)("End")("Blue").GetInt();
+		ColourRamp.push_back(h);
+		i++;
+	};
 }
 
 bool clsWindow::GetFolderSaveName(char* pFolderPath, int iPathBufferSize) {
@@ -576,6 +713,42 @@ bool clsWindow::GetFolderSaveName(char* pFolderPath, int iPathBufferSize) {
 		CoUninitialize();
 	}
 	return bPathFound;
+}
+
+void clsWindow::SaveConfiguration(const std::string Filename){
+	clsHGOnode Parameters;
+	Parameters.SetName("PerlinNoise");
+	BITMAP bm = {};
+
+	GetObject(SwapBM, sizeof(BITMAP), &bm);
+	Parameters.AddChild("Screen", "");
+	Parameters("Screen").AddChild("Width", (int)bm.bmWidth);
+	Parameters("Screen").AddChild("Height", (int)bm.bmHeight);
+
+
+	Parameters.AddChild("Scale",PerlinScale);
+	Parameters.AddChild("Offset", "");
+	Parameters("Offset").AddChild("x", PerlinOffset[0]);
+	Parameters("Offset").AddChild("y", PerlinOffset[1]);
+	Parameters("Offset").AddChild("z", PerlinOffset[2]);
+	Parameters.AddChild("RefreshMS", RefreshMS);
+	Parameters.AddChild("NbrFrames", Frames);
+	Parameters.AddChild("Z-Increment", Zinc);
+	
+	for (int i = 0; i < ColourRamp.size(); i++) {
+		Parameters.AddChild("ColourRamp", "");
+		Parameters("ColourRamp", i).AddChild("Value", ColourRamp[i].MaxValue);
+		Parameters("ColourRamp", i).AddChild("Start", "");
+		Parameters("ColourRamp", i)("Start").AddChild("Red", ColourRamp[i].StartColour.r);
+		Parameters("ColourRamp", i)("Start").AddChild("Green", ColourRamp[i].StartColour.g);
+		Parameters("ColourRamp", i)("Start").AddChild("Blue", ColourRamp[i].StartColour.b);
+		Parameters("ColourRamp", i).AddChild("End", "");
+		Parameters("ColourRamp", i)("End").AddChild("Red", ColourRamp[i].EndColour.r);
+		Parameters("ColourRamp", i)("End").AddChild("Green", ColourRamp[i].EndColour.g);
+		Parameters("ColourRamp", i)("End").AddChild("Blue", ColourRamp[i].EndColour.b);
+	};
+
+	Parameters.SaveAs(Filename);
 }
 
 

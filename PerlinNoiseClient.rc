@@ -54,8 +54,10 @@ IDR_MAINMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&Save as ...\t ctl-s",        ID_FILE_SAVEAS
+        MENUITEM "Save &Image as ...\t ctl-s",  ID_FILE_SAVEAS
         MENUITEM "Save Series ...",             ID_FILE_SAVESERIES
+        MENUITEM "Save &Config as ...",         ID_FILE_SAVECONFIG
+        MENUITEM "Open Config ...",             ID_FILE_OPENCONFIG
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_FILE_EXIT
     END

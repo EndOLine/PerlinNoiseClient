@@ -23,7 +23,6 @@
 #define IDC_STARTBLUE                   1018
 #define IDC_ENDRED                      1019
 #define IDC_ENDGREEN                    1020
-#define IDC_EDIT7                       1021
 #define IDC_ENDBLUE                     1021
 #define ID_FILE_SAVEAS                  40001
 #define ID_FILE_EXIT                    40002
@@ -33,13 +32,16 @@
 #define ID_ACTION_TIMER                 40008
 #define ID_ACTION_FULLSCREEN            40013
 #define ID_FILE_SAVESERIES              40018
+#define ID_FILE_SAVECONFIGAS            40019
+#define ID_FILE_SAVECONFIG              40020
+#define ID_FILE_OPENCONFIG              40021
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
-#define _APS_NEXT_COMMAND_VALUE         40019
+#define _APS_NEXT_COMMAND_VALUE         40022
 #define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
