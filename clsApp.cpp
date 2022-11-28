@@ -13,6 +13,8 @@ bool clsApp::DoInitilize() {
 	SetWindowClass("Perlin Noise Client Class Name");
 	SetWindowTitle("Perlin Noise Client Title");
 	SetAcceleratorID(IDR_MAINACCELERATOR);
+	wcex.hIcon = LoadIcon(hAppInst, (LPCTSTR)IDI_ICON1);
+	wcex.hIconSm = LoadIcon(wcex.hInstance, (LPCTSTR)IDI_ICON1);
 	return true;
 };
 bool clsApp::DoBegin(int nCmdShow) {
