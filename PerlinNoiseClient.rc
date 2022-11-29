@@ -54,6 +54,7 @@ IDR_MAINMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
+        MENUITEM "Save polygon ...",            ID_FILE_SAVEPOLYGON
         MENUITEM "Save &Image as ...\t ctl-s",  ID_FILE_SAVEAS
         MENUITEM "Save Series ...",             ID_FILE_SAVESERIES
         MENUITEM "Save &Config as ...",         ID_FILE_SAVECONFIG

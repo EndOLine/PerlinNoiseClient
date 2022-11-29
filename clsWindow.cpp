@@ -41,6 +41,18 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	}
 	return true;
 	break;
+	case ID_FILE_SAVEPOLYGON: 
+	{
+		COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Polygon File Format", L"*.ply" },
+			{ L"All files", L"*.*" }
+		};
+		if (GetFileSaveName(filename, sizeof(filename), &FileTypes[0], _countof(FileTypes), L"ply")) {
+			SavePolygon(filename);
+		}; 
+	};
+		return true;
+		break;
 	case ID_FILE_SAVESERIES:
 		if (GetFolderSaveName(foldername, sizeof(foldername))) {
 			for (int i = 0; i < Frames; i++) {
@@ -376,12 +388,36 @@ void clsWindow::SavePPM(HDC SwapDC, const char* Filename){
 	ppm.SaveP6(Filename);
 	SelectObject(SwapDC, OrigBitmap);
 }
+clsWindow::stColour clsWindow::ColourPixel(const double x, const double y, const double z) {
+	stColour RetColour = {};
+	double dx = x;
+	double dy = y;
+	double dz = z;
+	double pn = 0.0;
+	double Scale = PerlinScale;
+	//double Offset = PerlinOffset;
+	dx = (dx * Scale) + PerlinOffset[0];
+	dy = (dy * Scale) + PerlinOffset[1];
+	dz = (dz * Scale) + PerlinOffset[2];
+	pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
+
+
+	for (int i = 0; i < ColourRamp.size(); i++) {
+		if (pn < ColourRamp[i].MaxValue) {
+			RetColour.r = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r));
+			RetColour.g = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.g, ColourRamp[i].EndColour.g));
+			RetColour.b = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.b, ColourRamp[i].EndColour.b));
+			break;
+		};
+	};
+	return RetColour;
+}
 
 void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,const int StartColumn, const int IncrementColumn, const double Zvalue) {
 	if (!pPixels) {
 		return;								// if no buffer space just exit
 	};
-	
+	stColour wc;
 	struct stLocalColour { unsigned char b, g, r, unused; };		// backwards; 32 bit for padding
 	union uColour {													// to convert from structure to DWORD
 		stLocalColour stColour;
@@ -394,37 +430,28 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 			double dx = (double)x / (double)Width;
 			double dy = (double)y / (double)Height;
 			double dz = Zvalue;
-			double pn = 0.0;
-			double Scale = PerlinScale;
-			//double Offset = PerlinOffset;
-			dx = (dx * Scale) + PerlinOffset[0];
-			dy = (dy * Scale) + PerlinOffset[1];
-			dz = (dz * Scale) + PerlinOffset[2];
-			pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
+			wc = ColourPixel(dx, dy, dz);
+			Colour.stColour.r = wc.r;
+			Colour.stColour.g = wc.g;
+			Colour.stColour.b = wc.b;
+			//double pn = 0.0;
+			//double Scale = PerlinScale;
+			////double Offset = PerlinOffset;
+			//dx = (dx * Scale) + PerlinOffset[0];
+			//dy = (dy * Scale) + PerlinOffset[1];
+			//dz = (dz * Scale) + PerlinOffset[2];
+			//pn = ((Noise.noise(dx, dy, dz)) * 0.5) + 0.5;   // change from -1.0 -> 1.0; to 0.0 -> 1.0
 
 
-			Colour.stColour = { 0,0,0 };
-			for (int i = 0; i < ColourRamp.size(); i++) {
-				if (pn < ColourRamp[i].MaxValue) {
-					//(i>0?ColourRamp[i-1].MaxValue:0.0f)
-					//double bScaled = ScaleValue(pn, 0.0f, ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r);
-					Colour.stColour.r = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r));
-					Colour.stColour.g = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.g, ColourRamp[i].EndColour.g));
-					Colour.stColour.b = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.b, ColourRamp[i].EndColour.b));
-					break;
-				};
-			};
-			/*if (pn < 0.1) {
-				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
-			} else if (pn < 0.4) {
-				Colour.stColour.b = (unsigned char)floor((255) * (pn + 0.4f));
-				Colour.stColour.g = Colour.stColour.r = 0;
-			} else if (pn < 0.9) {
-				Colour.stColour.g = (unsigned char)floor((255) * pn);
-				Colour.stColour.r = Colour.stColour.b = 0;
-			} else {
-				Colour.stColour.r = Colour.stColour.g = Colour.stColour.b = (unsigned char)floor((255) * pn);
-			};*/
+			//Colour.stColour = { 0,0,0 };
+			//for (int i = 0; i < ColourRamp.size(); i++) {
+			//	if (pn < ColourRamp[i].MaxValue) {
+			//		Colour.stColour.r = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.r, ColourRamp[i].EndColour.r));
+			//		Colour.stColour.g = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.g, ColourRamp[i].EndColour.g));
+			//		Colour.stColour.b = floor(ScaleValue(pn, (i > 0 ? ColourRamp[i - 1].MaxValue : 0.0f), ColourRamp[i].MaxValue, ColourRamp[i].StartColour.b, ColourRamp[i].EndColour.b));
+			//		break;
+			//	};
+			//};
 
 			pSwapPixels[y * Width + x] = Colour.wColour;
 		};
@@ -752,3 +779,32 @@ void clsWindow::SaveConfiguration(const std::string Filename){
 }
 
 
+void clsWindow::SavePolygon(const char* pFileName) {
+//https://blogs.gre.ac.uk/captivate/point-cloud-rendering-blender-3-1/
+	clsPly Poly;
+	std::vector<clsPly::stVertex> vt;
+	std::vector<clsPly::stColour> ct;
+	clsPly::stVertex v = {};
+	clsPly::stColour c = {};
+	stColour wc = {};
+	
+	for (int x = 0; x < Frames; x++) {
+		for (int y = 0; y < Frames; y++) {
+			for (int z = 0; z < Frames; z++) {
+				double dx = (double)x / (double)Frames;
+				double dy = (double)y / (double)Frames;
+				double dz = (double)z / (double)Frames;
+				wc = ColourPixel(dx, dy, dz);
+				if ((wc.r == 0) && (wc.g == 0) && (wc.b == 0)) continue;		// skip if all back
+				c.red = wc.r; c.green = wc.g; c.blue = wc.b;
+				v.x = (double)x / (double)Frames;
+				v.y = (double)y / (double)Frames;
+				v.z = (double)z / (double)Frames;
+				vt.push_back(v);
+				ct.push_back(c);
+			}
+		}
+	}
+
+	Poly.Save(pFileName, vt.data(), vt.size(), 0, 0, ct.data());
+}

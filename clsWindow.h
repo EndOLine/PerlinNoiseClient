@@ -27,8 +27,13 @@ do something with colours
 #include "clsDialog.h"
 #include "..\Common\clsPPM.h"
 #include "..\Common\clsHGOnode.h"
+#include "clsPly.h"
 
 class clsWindow :public clsHGOWindow {
+public:
+	struct stColour {
+		unsigned char r = 0, g = 0, b = 0;
+	};
 private:
 	HDC SwapDC = 0;
 	HBITMAP SwapBM = 0;
@@ -42,9 +47,7 @@ private:
 	int Frames = 10000;							// number of frames to generate
 	double Zinc = 0.0001f;						// change in z value for each frame
 	int iTimeCounter = 0;						// timer counter
-	struct stColour {
-		unsigned char r=0, g=0, b=0;
-	};
+	
 	struct stColourRamp {
 		double MaxValue = 0.0f;					// applies to values < this
 		stColour StartColour;
@@ -67,6 +70,7 @@ public:
 	void GetLastErrorMessage(const DWORD LastError, char* poBuffer, int BufferSize);
 	double ScaleValue(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax);
 	void UpdateSwapBuffer();
+	stColour ColourPixel(const double x, const double y, const double z);
 	void UpdatePixels(DWORD* pPixels, const int Width, const int Height, const int StartColumn, const int IncrementColumn, const double Zvalue);
 	void UpdateSwapBuffer2(const double inputZ = 0.0);
 	void WindowsFullScreenToggle();
@@ -77,5 +81,6 @@ public:
 	bool GetFileOpenName(char* pFilePath, int iPathBufferSize, COMDLG_FILTERSPEC* inFileTypes=0, const int inNbrTypes=0, const wchar_t* inDefault=0);
 	void SaveConfiguration(const std::string Filename);
 	void LoadConfiguration(const std::string Filename);
+	void SavePolygon(const char * pFileName);
 };
 #endif

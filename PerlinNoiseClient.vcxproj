@@ -150,6 +150,7 @@
     <ClInclude Include="..\Common\clsPPM.h" />
     <ClInclude Include="clsApp.h" />
     <ClInclude Include="clsDialog.h" />
+    <ClInclude Include="clsPly.h" />
     <ClInclude Include="clsWindow.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="..\Common\clsPPM.cpp" />
     <ClCompile Include="clsApp.cpp" />
     <ClCompile Include="clsDialog.cpp" />
+    <ClCompile Include="clsPly.cpp" />
     <ClCompile Include="clsWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

@@ -45,6 +45,9 @@
     <ClInclude Include="..\Common\clsHGOnode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clsPly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="clsApp.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\clsHGOnode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clsPly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

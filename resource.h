@@ -36,13 +36,14 @@
 #define ID_FILE_SAVECONFIGAS            40019
 #define ID_FILE_SAVECONFIG              40020
 #define ID_FILE_OPENCONFIG              40021
+#define ID_FILE_SAVEPOLYGON             40022
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        109
-#define _APS_NEXT_COMMAND_VALUE         40022
+#define _APS_NEXT_COMMAND_VALUE         40023
 #define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
