@@ -800,8 +800,9 @@ void clsWindow::SavePolygon(const char* pFileName) {
 				Vertex.x = (double)x / (double)Frames;
 				Vertex.y = (double)y / (double)Frames;
 				Vertex.z = (double)z / (double)Frames;
+				Vertex = (Vertex * PerlinScale) + clsCartCoord(PerlinOffset[0], PerlinOffset[1], PerlinOffset[2]);
 				//
-				Mesh.AddCube(Vertex,1.0f/(double)Frames,Colour );
+				Mesh.AddCube(Vertex,(1.0f/(double)Frames) * PerlinScale,Colour );
 				//Mesh.AddCubeColourPoints(Vertex, 1.0f / (double)Frames, Colour);
 			}
 		}

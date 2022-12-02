@@ -5,7 +5,7 @@
 *			   This is to replace clsMesh (the old one)
 * Log:
 *	20221130: created
-*  
+*   20221202: new operator* operator/ with floats
 */
 #ifndef CLSCARTCOORD_H
 #define CLSCARTCOORD_H
@@ -48,6 +48,8 @@ public:
 	// Binary Arithmetic Operators
 	const clsCartCoord operator+(const clsCartCoord& other) const;
 	const clsCartCoord operator-(const clsCartCoord& other) const;
+	const clsCartCoord operator*(const float& rhs) const;
+	const clsCartCoord operator/(const float& rhs) const;
 
 	//Comparison Operators
 	bool operator==(const clsCartCoord& other) const;

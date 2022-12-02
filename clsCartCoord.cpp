@@ -124,6 +124,18 @@ const clsCartCoord clsCartCoord::operator-(const clsCartCoord& other) const {
 	return result;					// All done!
 }
 
+const clsCartCoord clsCartCoord::operator*(const float& rhs) const {
+	clsCartCoord result = *this;
+	result *= rhs;
+	return result;
+}
+
+const clsCartCoord clsCartCoord::operator/(const float& rhs) const {
+	clsCartCoord result = *this;
+	result /= rhs;
+	return result;
+}
+
 // compare floats by comparing to an epsilon value
 bool clsCartCoord::EqualTo(const clsCartCoord& A, const float epsilon) const {
 	if ((fabs(x - A.x) < epsilon) && (fabs(y - A.y) < epsilon) && (fabs(z - A.z) < epsilon)) {
