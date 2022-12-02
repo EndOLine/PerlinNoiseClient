@@ -6,6 +6,7 @@ Author: Harold Otterdyks
 Description:
 	save  "Polygon File Format" aka the "Stanford Triangle Format"
 Notes:
+	seems like blender does not like colour on points in general and no colour from ply faces.
 20200201: created
 20221116: documentation modified
 ******************************************************************************************/
@@ -20,7 +21,7 @@ public:
 		float x, y, z;
 	};
 	struct stColour {
-		unsigned char red, green, blue;
+		unsigned char red, green, blue,alpha;
 	};
 
 	struct stFace3vertex {
@@ -87,7 +88,10 @@ private:
 public:
 	clsPly();
 	~clsPly();
-	void Save(const char *pczLogFile, const stVertex *stVertexList,int iVertexCount, const stFace3vertex *stFaceList,int iFaceCount, 
-		      const stColour *stColourList=NULL, const stFace3Texture *stTextureList = NULL);
+	void Save(const char *pczLogFile, 
+				const stVertex *stVertexList, const int iVertexCount, 
+				const stFace3vertex *stFaceList, const int iFaceCount, 
+				const stColour *stColourList=NULL, const int iColourCount=0, 
+				const stFace3Texture *stTextureList = NULL);
 };
 

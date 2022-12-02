@@ -149,7 +149,11 @@
     <ClInclude Include="..\Common\clsPerlinNoise.h" />
     <ClInclude Include="..\Common\clsPPM.h" />
     <ClInclude Include="clsApp.h" />
+    <ClInclude Include="clsCartCoord.h" />
+    <ClInclude Include="clsCLR.h" />
     <ClInclude Include="clsDialog.h" />
+    <ClInclude Include="clsMesh2.h" />
+    <ClInclude Include="clsOBJ.h" />
     <ClInclude Include="clsPly.h" />
     <ClInclude Include="clsWindow.h" />
     <ClInclude Include="main.h" />
@@ -162,7 +166,11 @@
     <ClCompile Include="..\Common\clsPerlinNoise.cpp" />
     <ClCompile Include="..\Common\clsPPM.cpp" />
     <ClCompile Include="clsApp.cpp" />
+    <ClCompile Include="clsCartCoord.cpp" />
+    <ClCompile Include="clsCLR.cpp" />
     <ClCompile Include="clsDialog.cpp" />
+    <ClCompile Include="clsMesh2.cpp" />
+    <ClCompile Include="clsOBJ.cpp" />
     <ClCompile Include="clsPly.cpp" />
     <ClCompile Include="clsWindow.cpp" />
     <ClCompile Include="main.cpp" />

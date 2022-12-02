@@ -28,12 +28,14 @@ do something with colours
 #include "..\Common\clsPPM.h"
 #include "..\Common\clsHGOnode.h"
 #include "clsPly.h"
+#include "clsCartCoord.h"
+#include "clsMesh2.h"
 
 class clsWindow :public clsHGOWindow {
 public:
-	struct stColour {
+	/*struct stColour {
 		unsigned char r = 0, g = 0, b = 0;
-	};
+	};*/
 private:
 	HDC SwapDC = 0;
 	HBITMAP SwapBM = 0;
@@ -50,8 +52,8 @@ private:
 	
 	struct stColourRamp {
 		double MaxValue = 0.0f;					// applies to values < this
-		stColour StartColour;
-		stColour EndColour;
+		clsRGBa StartColour;
+		clsRGBa EndColour;
 	};
 	std::vector<stColourRamp> ColourRamp;
 
@@ -70,7 +72,7 @@ public:
 	void GetLastErrorMessage(const DWORD LastError, char* poBuffer, int BufferSize);
 	double ScaleValue(double dInput, double dInputMin, double dInputMax, double dOutPutMin, double dOutputMax);
 	void UpdateSwapBuffer();
-	stColour ColourPixel(const double x, const double y, const double z);
+	clsRGBa ColourPixel(const double x, const double y, const double z);
 	void UpdatePixels(DWORD* pPixels, const int Width, const int Height, const int StartColumn, const int IncrementColumn, const double Zvalue);
 	void UpdateSwapBuffer2(const double inputZ = 0.0);
 	void WindowsFullScreenToggle();

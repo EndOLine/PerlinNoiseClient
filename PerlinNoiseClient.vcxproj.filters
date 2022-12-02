@@ -48,6 +48,18 @@
     <ClInclude Include="clsPly.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clsCartCoord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clsMesh2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clsCLR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clsOBJ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="clsApp.cpp">
@@ -78,6 +90,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="clsPly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clsCartCoord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clsMesh2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clsCLR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clsOBJ.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

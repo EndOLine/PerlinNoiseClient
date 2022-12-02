@@ -388,8 +388,8 @@ void clsWindow::SavePPM(HDC SwapDC, const char* Filename){
 	ppm.SaveP6(Filename);
 	SelectObject(SwapDC, OrigBitmap);
 }
-clsWindow::stColour clsWindow::ColourPixel(const double x, const double y, const double z) {
-	stColour RetColour = {};
+clsRGBa clsWindow::ColourPixel(const double x, const double y, const double z) {
+	clsRGBa RetColour = {};
 	double dx = x;
 	double dy = y;
 	double dz = z;
@@ -417,7 +417,7 @@ void clsWindow::UpdatePixels(DWORD *pPixels, const int Width, const int Height,c
 	if (!pPixels) {
 		return;								// if no buffer space just exit
 	};
-	stColour wc;
+	clsRGBa wc;
 	struct stLocalColour { unsigned char b, g, r, unused; };		// backwards; 32 bit for padding
 	union uColour {													// to convert from structure to DWORD
 		stLocalColour stColour;
@@ -782,11 +782,10 @@ void clsWindow::SaveConfiguration(const std::string Filename){
 void clsWindow::SavePolygon(const char* pFileName) {
 //https://blogs.gre.ac.uk/captivate/point-cloud-rendering-blender-3-1/
 	clsPly Poly;
-	std::vector<clsPly::stVertex> vt;
-	std::vector<clsPly::stColour> ct;
-	clsPly::stVertex v = {};
-	clsPly::stColour c = {};
-	stColour wc = {};
+	//
+	clsMesh2 Mesh;
+	clsRGBa  Colour;
+	clsCartCoord Vertex;
 	
 	for (int x = 0; x < Frames; x++) {
 		for (int y = 0; y < Frames; y++) {
@@ -794,17 +793,21 @@ void clsWindow::SavePolygon(const char* pFileName) {
 				double dx = (double)x / (double)Frames;
 				double dy = (double)y / (double)Frames;
 				double dz = (double)z / (double)Frames;
-				wc = ColourPixel(dx, dy, dz);
-				if ((wc.r == 0) && (wc.g == 0) && (wc.b == 0)) continue;		// skip if all back
-				c.red = wc.r; c.green = wc.g; c.blue = wc.b;
-				v.x = (double)x / (double)Frames;
-				v.y = (double)y / (double)Frames;
-				v.z = (double)z / (double)Frames;
-				vt.push_back(v);
-				ct.push_back(c);
+				Colour = ColourPixel(dx, dy, dz);
+				if ((Colour.r == 0) && (Colour.g == 0) && (Colour.b == 0)) {	// skip if all black
+					continue;
+				};		
+				Vertex.x = (double)x / (double)Frames;
+				Vertex.y = (double)y / (double)Frames;
+				Vertex.z = (double)z / (double)Frames;
+				//
+				Mesh.AddCube(Vertex,1.0f/(double)Frames,Colour );
+				//Mesh.AddCubeColourPoints(Vertex, 1.0f / (double)Frames, Colour);
 			}
 		}
 	}
 
-	Poly.Save(pFileName, vt.data(), vt.size(), 0, 0, ct.data());
+	//Poly.Save(pFileName,(clsPly::stVertex *)  Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*) Mesh.FaceList.data(),Mesh.FaceList.size(), (clsPly::stColour*)Mesh.ColourList.data(),Mesh.ColourList.size());
+	//Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), 0, 0, (clsPly::stColour*)Mesh.ColourList.data());
+	Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*)Mesh.FaceList.data(), Mesh.FaceList.size());
 }
