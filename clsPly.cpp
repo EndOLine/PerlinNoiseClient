@@ -24,7 +24,7 @@ clsPly::~clsPly(){
 void clsPly::Save(const char *pczLogFile, 
 					const stVertex *stVertexList, const int iVertexCount, 
 					const stFace3vertex *stFaceList, const int iFaceCount, 
-					const stColour *stColourList, const int iColourCount, 
+					const clsRGBa *stColourList, const int iColourCount, 
 					const stFace3Texture *stTextureList) {
 
 	fFileHandle = _fsopen(pczLogFile, "wt", _SH_DENYWR);
@@ -66,7 +66,7 @@ void clsPly::Save(const char *pczLogFile,
 	// list vertexs
 	if ((iColourCount != 0) && (iColourCount == iVertexCount)) {						// check if colours are given
 		for (int i = 0; i < iVertexCount; i++) {
-			fprintf(fFileHandle,"%f %f %f %i %i %i\n", stVertexList[i].x, stVertexList[i].y, stVertexList[i].z, stColourList[i].red, stColourList[i].green, stColourList[i].blue);
+			fprintf(fFileHandle,"%f %f %f %i %i %i\n", stVertexList[i].x, stVertexList[i].y, stVertexList[i].z, stColourList[i].r , stColourList[i].g , stColourList[i].b );
 		};
 	} else {
 		for (int i = 0; i < iVertexCount; i++) {
@@ -77,7 +77,7 @@ void clsPly::Save(const char *pczLogFile,
 	if ((iColourCount != 0) && (iColourCount == iFaceCount)) {
 		for (int i = 0; i < iFaceCount; i++) {
 			fprintf(fFileHandle, "3 %i %i %i %i %i %i\n", stFaceList[i].i[0], stFaceList[i].i[1], stFaceList[i].i[2],
-				stColourList[i].red, stColourList[i].green, stColourList[i].blue);
+				stColourList[i].r, stColourList[i].g, stColourList[i].b);
 		};
 	} else if ((stTextureList != NULL) && (stFaceList != NULL)) {
 		for (int i = 0; i < iFaceCount; i++) {

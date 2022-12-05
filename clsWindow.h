@@ -28,6 +28,7 @@ do something with colours
 #include "..\Common\clsPPM.h"
 #include "..\Common\clsHGOnode.h"
 #include "clsPly.h"
+#include "clsOBJ.h"
 #include "clsCartCoord.h"
 #include "clsMesh2.h"
 

@@ -9,10 +9,12 @@ Notes:
 	seems like blender does not like colour on points in general and no colour from ply faces.
 20200201: created
 20221116: documentation modified
+20221205: include clsCLR
 ******************************************************************************************/
 #define WIN32_LEAN_AND_MEAN
 #include <stdio.h> 
 #include <share.h>
+#include "clsCLR.h"
 
 class clsPly
 {
@@ -20,9 +22,9 @@ public:
 	struct stVertex {
 		float x, y, z;
 	};
-	struct stColour {
-		unsigned char red, green, blue,alpha;
-	};
+	//struct stColour {
+	//	unsigned char red, green, blue,alpha;
+	//};
 
 	struct stFace3vertex {
 		int i[3];
@@ -91,7 +93,7 @@ public:
 	void Save(const char *pczLogFile, 
 				const stVertex *stVertexList, const int iVertexCount, 
 				const stFace3vertex *stFaceList, const int iFaceCount, 
-				const stColour *stColourList=NULL, const int iColourCount=0, 
+				const clsRGBa *stColourList=NULL, const int iColourCount=0, 
 				const stFace3Texture *stTextureList = NULL);
 };
 

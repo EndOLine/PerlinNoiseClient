@@ -21,21 +21,23 @@ int clsMesh2::FindVertex(const clsCartCoord& VertexIn) {
 			return i;
 		};
 	};
-	return -1;
+	return NOT_FOUND;
 }
 
 int clsMesh2::FindVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn){
-	if (VertexList.size() != ColourList.size()) {
-		return -2;							// Error
+	if (VertexList.size() != ColourIndex.size()) {
+		return COLOUR_SIZE;							// Error
 	};
+	int IndexToColour = FindColour(ColourIn);
+	if (IndexToColour < 0) { return NOT_FOUND; };				// if colour not found return
 	for (int i = 0; i < VertexList.size(); i++) {
 		if (VertexList[i] == VertexIn) {
-			if (ColourList[0] == ColourIn) {
+			if (ColourIndex[i] == IndexToColour) {		// compare colour indices
 				return i;
 			}
 		};
 	};
-	return -1;
+	return NOT_FOUND;
 }
 
 int clsMesh2::FindFace(const int VertIndex1, const int VertIndex2, const int VertIndex3){
@@ -44,25 +46,37 @@ int clsMesh2::FindFace(const int VertIndex1, const int VertIndex2, const int Ver
 		if ((FaceList[i].i[0] == VertIndex2) && (FaceList[i].i[1] == VertIndex3) && (FaceList[i].i[2] == VertIndex1)) return i;
 		if ((FaceList[i].i[0] == VertIndex3) && (FaceList[i].i[1] == VertIndex1) && (FaceList[i].i[2] == VertIndex2)) return i;
 	};
-	return -1;
+	return NOT_FOUND;
 }
 
 int clsMesh2::FindFace(const int VertIndex1, const int VertIndex2, const int VertIndex3, const clsRGBa& ColourIn){
-	if (FaceList.size() != ColourList.size()) {
-		return -2;							// Error
+	if (FaceList.size() != ColourIndex.size()) {
+		return COLOUR_SIZE;							// Error
 	};
+	int IndexToColour = FindColour(ColourIn);
+	if (IndexToColour < 0) { return NOT_FOUND; };					// if colour not found return
 	for (int i = 0; i < FaceList.size(); i++) {
-		if (ColourList[i] != ColourIn) continue;					// if colour does not match then continue
+		if (ColourIndex[i] != IndexToColour) continue;					// if colour does not match then continue
 		if ((FaceList[i].i[0] == VertIndex1) && (FaceList[i].i[1] == VertIndex2) && (FaceList[i].i[2] == VertIndex3)) return i;
 		if ((FaceList[i].i[0] == VertIndex2) && (FaceList[i].i[1] == VertIndex3) && (FaceList[i].i[2] == VertIndex1)) return i;
 		if ((FaceList[i].i[0] == VertIndex3) && (FaceList[i].i[1] == VertIndex1) && (FaceList[i].i[2] == VertIndex2)) return i;
 	};
-	return -1;
+	return NOT_FOUND;
+}
+
+int clsMesh2::FindColour(const clsRGBa& ColourIn){
+	for (int i = 0; i < ColourList.size(); i++) {
+		if (ColourList[i] == ColourIn) {
+			return i;
+		};
+	};
+	return NOT_FOUND;
 }
 
 void clsMesh2::Clear(){
 	VertexList.clear();
 	ColourList.clear();
+	ColourIndex.clear();
 	FaceList.clear();
 }
 
@@ -77,24 +91,25 @@ int clsMesh2::AddVertex(const clsCartCoord& VertexIn){
 }
 
 int clsMesh2::AddVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn){
-	if (VertexList.size() != ColourList.size()) {		// colour list must be the same size as vertex
-		return -2;							// Error
+	if (VertexList.size() != ColourIndex.size()) {		// colour list must be the same size as vertex
+		return COLOUR_SIZE;							// Error
 	};
-	int vi = -1;
+	int vi = NOT_FOUND;
 	//vi = FindVertex(VertexIn,ColourIn);
+	int IndexToColour = AddColour(ColourIn);
 	if (vi < 0) {
 		vi = VertexList.size();
 		VertexList.push_back(VertexIn);
-		ColourList.push_back(ColourIn);
+		ColourIndex.push_back(IndexToColour);
 	};
 	return vi;
 }
 
 int clsMesh2::AddFace(const int VertIndex1, const int VertIndex2, const int VertIndex3){
 	if ((VertIndex1 > VertexList.size()) || (VertIndex2 > VertexList.size()) || (VertIndex3 > VertexList.size())) {
-		return -4;								// error
+		return INDEX_RANGE;								// error
 	};
-	int index = -1;
+	int index = NOT_FOUND;
 	//index = FindFace(VertIndex1, VertIndex2, VertIndex3);
 	if (index >= 0) {							// found
 		return index;
@@ -105,18 +120,30 @@ int clsMesh2::AddFace(const int VertIndex1, const int VertIndex2, const int Vert
 }
 
 int clsMesh2::AddFace(const int VertIndex1, const int VertIndex2, const int VertIndex3, const clsRGBa& ColourIn){
-	if (FaceList.size() != ColourList.size()) {		// colour list must be the same size as face list
-		return -2;							// Error
+	if (FaceList.size() != ColourIndex.size()) {		// colour list must be the same size as face list
+		return COLOUR_SIZE;							// Error
 	};
-	int index = -1;
+	int index = NOT_FOUND;
 	//index = FindFace(VertIndex1, VertIndex2, VertIndex3,ColourIn);
 	if (index >= 0) {							// found
 		return index;
 	};
+	int IndexToColour = AddColour(ColourIn);
 	index = FaceList.size();
 	FaceList.push_back({ VertIndex1,VertIndex2,VertIndex3 });
+	ColourIndex.push_back(IndexToColour);
+	return index;
+}
+
+int clsMesh2::AddColour(const clsRGBa& ColourIn){
+	int index = NOT_FOUND;
+	index = FindColour(ColourIn);
+	if (index >= 0) {
+		return index;
+	};
+	index = ColourList.size();
 	ColourList.push_back(ColourIn);
-	return 0;
+	return index;
 }
 
 void clsMesh2::AddCubeColourPoints(const clsCartCoord& CenterPointIn, const float WidthIn, const clsRGBa& ColourIn) {

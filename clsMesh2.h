@@ -19,11 +19,15 @@
 class clsMesh2{
 	
 public:	//parameters
+	const int NOT_FOUND = -1;
+	const int COLOUR_SIZE = -2;
+	const int INDEX_RANGE = -4;
 	struct stFace {
 		int i[3] = {};
 	};
 	std::vector<clsCartCoord> VertexList;
 	std::vector<clsRGBa> ColourList;
+	std::vector<int>     ColourIndex;				// list of indices to ColourList
 	std::vector<stFace> FaceList;
 private:
 	
@@ -33,6 +37,7 @@ public:	// functions
 	int AddVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn);
 	int AddFace(const int VertIndex1, const int VertIndex2, const int VertIndex3);
 	int AddFace(const int VertIndex1, const int VertIndex2, const int VertIndex3, const clsRGBa& ColourIn);
+	int AddColour(const clsRGBa& ColourIn);
 	void AddCube(const clsCartCoord& CenterPoint, const float WidthIn, const clsRGBa& ColourIn);
 	void AddCubeColourPoints(const clsCartCoord& CenterPoint, const float WidthIn, const clsRGBa& ColourIn);
 private:
@@ -40,6 +45,7 @@ private:
 	int FindVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn);
 	int FindFace(const int VertIndex1, const int VertIndex2, const int VertIndex3);
 	int FindFace(const int VertIndex1, const int VertIndex2, const int VertIndex3, const clsRGBa& ColourIn);
+	int FindColour(const clsRGBa& ColourIn);
 };
 
 

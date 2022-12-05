@@ -44,10 +44,11 @@ bool clsWindow::DoCommand(int wmId, int wmEvent, LPARAM lParam) {
 	case ID_FILE_SAVEPOLYGON: 
 	{
 		COMDLG_FILTERSPEC FileTypes[] = {
+			{ L"Wavefront File Format", L"*.obj" },
 			{ L"Polygon File Format", L"*.ply" },
 			{ L"All files", L"*.*" }
 		};
-		if (GetFileSaveName(filename, sizeof(filename), &FileTypes[0], _countof(FileTypes), L"ply")) {
+		if (GetFileSaveName(filename, sizeof(filename), &FileTypes[0], _countof(FileTypes), L"obj")) {
 			SavePolygon(filename);
 		}; 
 	};
@@ -782,6 +783,7 @@ void clsWindow::SaveConfiguration(const std::string Filename){
 void clsWindow::SavePolygon(const char* pFileName) {
 //https://blogs.gre.ac.uk/captivate/point-cloud-rendering-blender-3-1/
 	clsPly Poly;
+	clsOBJ Poly2;
 	//
 	clsMesh2 Mesh;
 	clsRGBa  Colour;
@@ -808,7 +810,25 @@ void clsWindow::SavePolygon(const char* pFileName) {
 		}
 	}
 
-	//Poly.Save(pFileName,(clsPly::stVertex *)  Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*) Mesh.FaceList.data(),Mesh.FaceList.size(), (clsPly::stColour*)Mesh.ColourList.data(),Mesh.ColourList.size());
-	//Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), 0, 0, (clsPly::stColour*)Mesh.ColourList.data());
-	Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*)Mesh.FaceList.data(), Mesh.FaceList.size());
+	// disassemble file name to give it the proper extension
+	char path_buffer[_MAX_PATH];
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+	char fname[_MAX_FNAME];
+	char ext[_MAX_EXT];
+	errno_t err;
+
+	err = _splitpath_s(pFileName, drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, ext, _MAX_EXT);
+
+	//Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*)Mesh.FaceList.data(), Mesh.FaceList.size());
+	std::string extension = ext;
+	std::transform(extension.begin(), extension.end(), extension.begin(),	[](unsigned char c) { return std::tolower(c); });
+	if (extension == ".ply") {
+		Poly.Save(pFileName, (clsPly::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(), (clsPly::stFace3vertex*)Mesh.FaceList.data(), Mesh.FaceList.size());
+	} else if (extension == ".obj") {
+		Poly2.SaveObj(pFileName, "Perlin Noise Visualization", (clsOBJ::stVertex*)Mesh.VertexList.data(), Mesh.VertexList.size(),
+			(clsOBJ::stFace3vertex*)Mesh.FaceList.data(), Mesh.FaceList.size(),
+			Mesh.ColourList.data(), Mesh.ColourList.size(),
+			Mesh.ColourIndex.data(), Mesh.ColourIndex.size());
+	};
 }
