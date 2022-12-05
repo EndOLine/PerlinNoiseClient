@@ -78,15 +78,30 @@ void clsMesh2::Clear(){
 	ColourList.clear();
 	ColourIndex.clear();
 	FaceList.clear();
+	UniqueSet.clear();	CheckForUnique = false;
 }
 
 int clsMesh2::AddVertex(const clsCartCoord& VertexIn){
 	int vi = -1;
 	//vi = FindVertex(VertexIn);
+	if (CheckForUnique) {
+		// look for existing vertex
+		auto search = UniqueSet.find({ VertexIn,0,0 });
+		if (search != UniqueSet.end()) {			// found duplicate
+			vi = (*search).ExistingVertexIndex;
+			return vi;
+		};
+	};
+
 	if (vi < 0) {
 		vi = VertexList.size();
 		VertexList.push_back(VertexIn);
 	};
+
+	if (CheckForUnique) {						// add to unique table
+		UniqueSet.insert({ VertexIn,0,vi });
+	};
+
 	return vi;
 }
 
@@ -97,11 +112,26 @@ int clsMesh2::AddVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn){
 	int vi = NOT_FOUND;
 	//vi = FindVertex(VertexIn,ColourIn);
 	int IndexToColour = AddColour(ColourIn);
+
+	if (CheckForUnique) {
+		// look for existing vertex
+		auto search = UniqueSet.find({ VertexIn,IndexToColour,0 });
+		if (search != UniqueSet.end()) {			// found duplicate
+			vi = (*search).ExistingVertexIndex;
+			return vi;
+		};
+	};
+
 	if (vi < 0) {
 		vi = VertexList.size();
 		VertexList.push_back(VertexIn);
 		ColourIndex.push_back(IndexToColour);
 	};
+	if (CheckForUnique) {						// add to unique table
+		UniqueSet.insert({ VertexIn,IndexToColour,vi });
+	};
+
+
 	return vi;
 }
 
@@ -186,6 +216,15 @@ void clsMesh2::AddCubeColourPoints(const clsCartCoord& CenterPointIn, const floa
 	AddFace(iStartIdx[1], iStartIdx[5], iStartIdx[4]);
 	AddFace(iStartIdx[2], iStartIdx[6], iStartIdx[3]);
 	AddFace(iStartIdx[2], iStartIdx[7], iStartIdx[6]);
+}
+
+void clsMesh2::UniqueBegin(){
+	UniqueSet.clear();
+	CheckForUnique = true;
+}
+void clsMesh2::UniqueEnd() {
+	CheckForUnique = false; 
+	UniqueSet.clear();
 }
 
 void clsMesh2::AddCube(const clsCartCoord& CenterPointIn, const float WidthIn, const clsRGBa& ColourIn) {

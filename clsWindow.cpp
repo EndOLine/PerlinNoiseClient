@@ -789,6 +789,7 @@ void clsWindow::SavePolygon(const char* pFileName) {
 	clsRGBa  Colour;
 	clsCartCoord Vertex;
 	
+	Mesh.UniqueBegin();
 	for (int x = 0; x < Frames; x++) {
 		for (int y = 0; y < Frames; y++) {
 			for (int z = 0; z < Frames; z++) {
@@ -809,7 +810,7 @@ void clsWindow::SavePolygon(const char* pFileName) {
 			}
 		}
 	}
-
+	Mesh.UniqueEnd();
 	// disassemble file name to give it the proper extension
 	char path_buffer[_MAX_PATH];
 	char drive[_MAX_DRIVE];

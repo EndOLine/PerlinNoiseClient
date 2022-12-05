@@ -13,7 +13,9 @@
 #define CLSMESH2_H
 #define WIN32_LEAN_AND_MEAN
 #include <vector>
-#include <fstream>
+//#include <fstream>
+#include <functional>
+#include <unordered_set>
 #include "clsCartCoord.h"
 #include "clsCLR.h"
 class clsMesh2{
@@ -29,6 +31,25 @@ public:	//parameters
 	std::vector<clsRGBa> ColourList;
 	std::vector<int>     ColourIndex;				// list of indices to ColourList
 	std::vector<stFace> FaceList;
+
+	// for finding unique vertexes
+	struct stUniqueVertex {
+		clsCartCoord Vertex;
+		int			 ColourIndex;
+		int			 ExistingVertexIndex;			// where is the existing vertex in VertexList[]
+		bool operator==(const stUniqueVertex& t) const { return ((this->Vertex == t.Vertex) && (this->ColourIndex == t.ColourIndex)); };
+	};
+	class SetHashFunction {
+	public:
+		// id is returned as hash function
+		size_t operator()(const stUniqueVertex& t) const {
+			std::size_t h1 = std::hash<float>{}(t.Vertex.x) ^ std::hash<float>{}(t.Vertex.y) ^ std::hash<float>{}(t.Vertex.z);
+			return h1;
+		};
+	};
+	std::unordered_set<stUniqueVertex, SetHashFunction> UniqueSet;
+	bool CheckForUnique = false;
+
 private:
 	
 public:	// functions
@@ -40,6 +61,8 @@ public:	// functions
 	int AddColour(const clsRGBa& ColourIn);
 	void AddCube(const clsCartCoord& CenterPoint, const float WidthIn, const clsRGBa& ColourIn);
 	void AddCubeColourPoints(const clsCartCoord& CenterPoint, const float WidthIn, const clsRGBa& ColourIn);
+	void UniqueBegin();
+	void UniqueEnd();
 private:
 	int FindVertex(const clsCartCoord& VertexIn);
 	int FindVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn);
