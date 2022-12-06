@@ -227,6 +227,19 @@ void clsMesh2::UniqueEnd() {
 	UniqueSet.clear();
 }
 
+clsMesh2& clsMesh2::operator=(const clsMesh2& rhs){
+	// Only do assignment if RHS is a different object from this.
+	if (this != &rhs) {
+		// Deallocate, allocate new space, copy values...
+		Clear();
+		VertexList = rhs.VertexList;
+		ColourList = rhs.ColourList;
+		ColourIndex = rhs.ColourIndex;
+		FaceList = rhs.FaceList;
+	};
+	return *this;
+}
+
 void clsMesh2::AddCube(const clsCartCoord& CenterPointIn, const float WidthIn, const clsRGBa& ColourIn) {
 	/* Cube nodes:
 	*

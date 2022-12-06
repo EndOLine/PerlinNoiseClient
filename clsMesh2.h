@@ -63,6 +63,8 @@ public:	// functions
 	void AddCubeColourPoints(const clsCartCoord& CenterPoint, const float WidthIn, const clsRGBa& ColourIn);
 	void UniqueBegin();
 	void UniqueEnd();
+	// assignment operator
+	clsMesh2& operator=(const clsMesh2& rhs);
 private:
 	int FindVertex(const clsCartCoord& VertexIn);
 	int FindVertex(const clsCartCoord& VertexIn, const clsRGBa& ColourIn);
